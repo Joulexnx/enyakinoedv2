@@ -1,0 +1,233 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 233 18% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 233 18% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 233 18% 12%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 233 18% 12%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 225 8% 47%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 233 18% 12%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 221 83% 53%;
+    --radius: 0.75rem;
+
+    /* Custom colors */
+    --accent-red: #DC2626;
+    --accent-red-hover: #B91C1C;
+    --accent-red-light: #FEE2E2;
+    --accent-green: #059669;
+    --accent-green-hover: #047857;
+    --accent-green-light: #D1FAE5;
+    --accent-blue: #2563EB;
+    --accent-blue-hover: #1D4ED8;
+    --accent-blue-light: #DBEAFE;
+    --accent-amber: #D97706;
+    --accent-amber-light: #FEF3C7;
+    --bg-primary: #F7F8FA;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1D26;
+    --text-secondary: #5E6270;
+    --text-muted: #8F95A3;
+    --border-subtle: #F3F4F6;
+    --map-bg: #E8EAF0;
+  }
+
+  /* Dark mode overrides */
+  html.dark {
+    --background: 233 18% 8%;
+    --foreground: 0 0% 98%;
+    --card: 233 16% 12%;
+    --card-foreground: 0 0% 98%;
+    --popover: 233 16% 12%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 233 14% 18%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 233 14% 18%;
+    --muted-foreground: 225 8% 60%;
+    --accent: 233 14% 18%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 233 12% 22%;
+    --input: 233 12% 22%;
+    --ring: 217 91% 60%;
+
+    /* Custom dark colors */
+    --accent-red: #EF4444;
+    --accent-red-hover: #F87171;
+    --accent-red-light: rgba(239, 68, 68, 0.15);
+    --accent-green: #10B981;
+    --accent-green-hover: #34D399;
+    --accent-green-light: rgba(16, 185, 129, 0.15);
+    --accent-blue: #3B82F6;
+    --accent-blue-hover: #60A5FA;
+    --accent-blue-light: rgba(59, 130, 246, 0.15);
+    --accent-amber: #F59E0B;
+    --accent-amber-light: rgba(245, 158, 11, 0.15);
+    --bg-primary: #0D0F18;
+    --bg-card: #161823;
+    --text-primary: #F1F2F6;
+    --text-secondary: #A0A6B8;
+    --text-muted: #5E6380;
+    --border-subtle: #1E2030;
+    --map-bg: #1A1D2E;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-[var(--bg-primary)] text-[var(--text-primary)] antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  * {
+    @apply border-[var(--border)];
+  }
+}
+
+@layer utilities {
+  .shadow-glow-red {
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.15);
+  }
+  .shadow-glow-blue {
+    box-shadow: 0 0 20px rgba(37, 99, 235, 0.12);
+  }
+}
+
+/* Pin pulse animation */
+@keyframes pinPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+.pin-pulse::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: var(--accent-red);
+  animation: pinPulse 2s ease-in-out infinite;
+  z-index: -1;
+}
+
+/* Status dot pulse */
+@keyframes statusPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+}
+
+.status-pulse {
+  animation: statusPulse 2s ease-in-out infinite;
+}
+
+/* Shimmer loading */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.5),
+    transparent
+  );
+  animation: shimmer 1.5s linear infinite;
+}
+
+html.dark .shimmer::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.08),
+    transparent
+  );
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--border-subtle);
+  border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--accent-blue);
+  border-radius: 3px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Leaflet overrides */
+.leaflet-container {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+  padding: 0 !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  padding: 16px !important;
+}
+
+.leaflet-popup-tip {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+}
