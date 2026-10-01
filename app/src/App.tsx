@@ -9,8 +9,9 @@ import { NearbyOEDList } from '@/sections/NearbyOEDList';
 import { InformationPanel } from '@/sections/InformationPanel';
 import { TYDGuide } from '@/sections/TYDGuide';
 import { Footer } from '@/sections/Footer';
+import PrivacyPolicy from '@/pages/PrivacyPolicy';
 
-export default function App() {
+function HomePage() {
   const {
     status,
     userLocation,
@@ -21,30 +22,47 @@ export default function App() {
   } = useGeolocation();
 
   return (
+    <div className="min-h-screen bg-[var(--bg-primary)]">
+      <HeaderBar />
+      <EmergencyAlertBanner />
+
+      <main>
+        <HeroSection onRequestLocation={requestLocation} />
+
+        <StatisticsDashboard
+          nearestDistance={nearestDistance}
+          walkingTime={walkingTime}
+        />
+
+        <MapSection
+          userLocation={userLocation}
+          geolocationStatus={status}
+          oedLocations={sortedOEDs}
+          onRequestLocation={requestLocation}
+        />
+
+        <NearbyOEDList oedLocations={sortedOEDs} />
+
+        <InformationPanel />
+
+        <TYDGuide />
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
+
+export default function App() {
+  const path = window.location.pathname.replace(/\/+$/, '') || '/';
+
+  return (
     <ThemeProvider>
-      <div className="min-h-screen bg-[var(--bg-primary)]">
-        <HeaderBar />
-        <EmergencyAlertBanner />
-
-        <main>
-          <HeroSection onRequestLocation={requestLocation} />
-          <StatisticsDashboard
-            nearestDistance={nearestDistance}
-            walkingTime={walkingTime}
-          />
-          <MapSection
-            userLocation={userLocation}
-            geolocationStatus={status}
-            oedLocations={sortedOEDs}
-            onRequestLocation={requestLocation}
-          />
-          <NearbyOEDList oedLocations={sortedOEDs} />
-          <InformationPanel />
-          <TYDGuide />
-        </main>
-
-        <Footer />
-      </div>
+      {path === '/gizlilik-politikasi' ? (
+        <PrivacyPolicy />
+      ) : (
+        <HomePage />
+      )}
     </ThemeProvider>
   );
 }
