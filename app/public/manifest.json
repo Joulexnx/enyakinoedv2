@@ -1,0 +1,12 @@
+{
+  "background_color": "#ffffff",
+  "description": "Ani kalp durmasında en yakın OED'yi saniyeler içinde bulun. Hayat kurtarmak için geliştirildi.",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "En Yakın OED",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "OED Bul",
+  "start_url": "/",
+  "theme_color": "#ffffff"
+}
