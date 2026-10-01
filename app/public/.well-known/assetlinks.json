@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "tr.com.enyakinoed.twa",
+      "sha256_cert_fingerprints": [
+        "0D:F4:C6:D1:8D:27:EA:1E:FB:B8:3A:18:51:07:2C:00:57:AB:28:3E:DB:70:D5:73:0A:0F:AB:B9:5A:9D:4F:6F"
+      ]
+    }
+  }
+]
