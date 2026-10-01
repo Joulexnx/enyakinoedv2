@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/gizlilik-politikasi",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/gizlilik-politikasi/",
+      "destination": "/index.html"
+    }
+  ]
+}
