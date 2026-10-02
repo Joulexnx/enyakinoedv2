@@ -1,5 +1,12 @@
 import { useEffect, useState, useMemo } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from 'react-leaflet';
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMap,
+  Circle,
+} from 'react-leaflet';
 import { motion } from 'framer-motion';
 import { useInView } from '@/hooks/useInView';
 import type { UserLocation, OEDLocation } from '@/types';
@@ -12,6 +19,8 @@ interface MapSectionProps {
   oedLocations: OEDLocation[];
   onRequestLocation: () => void;
 }
+
+const CARTO_API_KEY = import.meta.env.VITE_CARTO_API_KEY;
 
 const oedIcon = L.divIcon({
   className: 'custom-oed-marker',
@@ -45,13 +54,20 @@ const nearestOedIcon = L.divIcon({
 
 const userIcon = L.divIcon({
   className: 'custom-user-marker',
-  html: `<div class="relative"><div class="w-4 h-4 rounded-full bg-[#2563EB] border-2 border-white shadow-md"></div></div>`,
+  html: `<div class="relative">
+    <div class="w-4 h-4 rounded-full bg-[#2563EB] border-2 border-white shadow-md"></div>
+  </div>`,
   iconSize: [16, 16],
   iconAnchor: [8, 8],
 });
 
-function MapController({ userLocation }: { userLocation: UserLocation | null }) {
+function MapController({
+  userLocation,
+}: {
+  userLocation: UserLocation | null;
+}) {
   const map = useMap();
+
   useEffect(() => {
     if (userLocation) {
       map.flyTo([userLocation.lat, userLocation.lng], 15, {
@@ -60,31 +76,45 @@ function MapController({ userLocation }: { userLocation: UserLocation | null }) 
       });
     }
   }, [userLocation, map]);
+
   return null;
 }
 
-export function MapSection({ userLocation, geolocationStatus, oedLocations, onRequestLocation }: MapSectionProps) {
+export function MapSection({
+  userLocation,
+  geolocationStatus,
+  oedLocations,
+  onRequestLocation,
+}: MapSectionProps) {
   const [mapRef, isInView] = useInView<HTMLDivElement>();
   const [isMapReady, setIsMapReady] = useState(false);
 
   const mapCenter = useMemo(() => {
-    if (userLocation) return [userLocation.lat, userLocation.lng] as [number, number];
+    if (userLocation) {
+      return [userLocation.lat, userLocation.lng] as [number, number];
+    }
+
     return [39.925533, 32.866287] as [number, number];
   }, [userLocation]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsMapReady(true), 300);
+    const timer = setTimeout(() => {
+      setIsMapReady(true);
+    }, 300);
+
     return () => clearTimeout(timer);
   }, []);
 
   return (
     <section className="pt-10 pb-12 sm:pb-16 px-4 sm:px-6">
       <div className="max-w-[1200px] mx-auto">
+
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
           <div>
             <h2 className="text-xl sm:text-2xl font-semibold text-[var(--text-primary)] tracking-tight">
               OED Konumları
             </h2>
+
             <p className="text-sm sm:text-base text-[var(--text-secondary)] mt-1">
               Haritada en yakın otomatik eksternal defibrilatörleri görüntüleyin
             </p>
@@ -92,41 +122,72 @@ export function MapSection({ userLocation, geolocationStatus, oedLocations, onRe
         </div>
 
         <div className="flex flex-wrap items-center gap-4 mb-4">
+
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-[#DC2626]"></span>
-            <span className="text-xs text-[var(--text-muted)]">OED Cihazı</span>
+            <span className="text-xs text-[var(--text-muted)]">
+              OED Cihazı
+            </span>
           </div>
+
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-[#2563EB]"></span>
-            <span className="text-xs text-[var(--text-muted)]">Sizin Konumunuz</span>
+            <span className="text-xs text-[var(--text-muted)]">
+              Sizin Konumunuz
+            </span>
           </div>
+
         </div>
 
         <motion.div
           ref={mapRef}
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{
+            duration: 0.6,
+            ease: [0.22, 1, 0.36, 1],
+          }}
           className="relative rounded-2xl shadow-xl border border-[var(--border)] overflow-hidden bg-white"
           style={{ aspectRatio: '16/9' }}
         >
+
           {!isMapReady || geolocationStatus === 'loading' ? (
+
             <SkeletonLoader />
-          ) : geolocationStatus === 'denied' || geolocationStatus === 'error' ? (
+
+          ) : geolocationStatus === 'denied' ||
+            geolocationStatus === 'error' ? (
+
             <div className="w-full h-full flex flex-col items-center justify-center bg-[var(--bg-primary)] min-h-[300px]">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5" className="opacity-30">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
+
+              <svg
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--text-muted)"
+                strokeWidth="1.5"
+                className="opacity-30"
+              >
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
               </svg>
-              <p className="mt-3 text-sm text-[var(--text-muted)]">Konumunuza erişmek için izin verin</p>
+
+              <p className="mt-3 text-sm text-[var(--text-muted)]">
+                Konumunuza erişmek için izin verin
+              </p>
+
               <button
                 onClick={onRequestLocation}
                 className="mt-3 px-5 py-2 rounded-lg bg-[var(--accent-blue)] text-white text-sm font-medium hover:bg-[var(--accent-blue-hover)] transition-colors"
               >
                 Konumumu Kullan
               </button>
+
             </div>
+
           ) : (
+
             <MapContainer
               center={mapCenter}
               zoom={13}
@@ -135,16 +196,22 @@ export function MapSection({ userLocation, geolocationStatus, oedLocations, onRe
               className="w-full h-full"
               style={{ minHeight: '300px' }}
             >
+
               <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
-                url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/" target="_blank" rel="noopener noreferrer">CARTO</a>'
+                url={`https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=${CARTO_API_KEY}`}
+                maxZoom={20}
               />
+
               <MapController userLocation={userLocation} />
 
               {userLocation && (
                 <>
                   <Circle
-                    center={[userLocation.lat, userLocation.lng]}
+                    center={[
+                      userLocation.lat,
+                      userLocation.lng,
+                    ]}
                     radius={userLocation.accuracy || 100}
                     pathOptions={{
                       color: '#2563EB',
@@ -154,7 +221,14 @@ export function MapSection({ userLocation, geolocationStatus, oedLocations, onRe
                       opacity: 0.3,
                     }}
                   />
-                  <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon} />
+
+                  <Marker
+                    position={[
+                      userLocation.lat,
+                      userLocation.lng,
+                    ]}
+                    icon={userIcon}
+                  />
                 </>
               )}
 
@@ -162,40 +236,76 @@ export function MapSection({ userLocation, geolocationStatus, oedLocations, onRe
                 <Marker
                   key={oed.id}
                   position={[oed.lat, oed.lng]}
-                  icon={index === 0 && oed.distance ? nearestOedIcon : oedIcon}
+                  icon={
+                    index === 0 && oed.distance
+                      ? nearestOedIcon
+                      : oedIcon
+                  }
                 >
+
                   <Popup>
+
                     <div className="min-w-[200px]">
-                      <h3 className="text-sm font-semibold text-[var(--text-primary)]">{oed.name}</h3>
-                      <p className="text-xs text-[var(--text-muted)] mt-1">{oed.address}</p>
+
+                      <h3 className="text-sm font-semibold text-[var(--text-primary)]">
+                        {oed.name}
+                      </h3>
+
+                      <p className="text-xs text-[var(--text-muted)] mt-1">
+                        {oed.address}
+                      </p>
+
                       <div className="flex items-center gap-2 mt-2">
-                        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                          oed.status === 'available'
-                            ? 'bg-[var(--accent-green-light)] text-[var(--accent-green)]'
+
+                        <span
+                          className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                            oed.status === 'available'
+                              ? 'bg-[var(--accent-green-light)] text-[var(--accent-green)]'
+                              : oed.status === 'in-use'
+                              ? 'bg-[var(--accent-amber-light)] text-[var(--accent-amber)]'
+                              : 'bg-gray-100 text-gray-500'
+                          }`}
+                        >
+                          {oed.status === 'available'
+                            ? 'Müsait'
                             : oed.status === 'in-use'
-                            ? 'bg-[var(--accent-amber-light)] text-[var(--accent-amber)]'
-                            : 'bg-gray-100 text-gray-500'
-                        }`}>
-                          {oed.status === 'available' ? 'Müsait' : oed.status === 'in-use' ? 'Kullanımda' : 'Bilinmiyor'}
+                            ? 'Kullanımda'
+                            : 'Bilinmiyor'}
                         </span>
+
                         {oed.distance !== undefined && (
                           <span className="text-[10px] font-medium text-[var(--accent-blue)]">
-                            {oed.distance < 1000 ? `${oed.distance}m` : `${(oed.distance / 1000).toFixed(1)}km`}
+                            {oed.distance < 1000
+                              ? `${oed.distance}m`
+                              : `${(oed.distance / 1000).toFixed(1)}km`}
                           </span>
                         )}
+
                       </div>
+
                       <button
-                        onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${oed.lat},${oed.lng}`, '_blank')}
+                        onClick={() =>
+                          window.open(
+                            `https://www.google.com/maps/dir/?api=1&destination=${oed.lat},${oed.lng}`,
+                            '_blank'
+                          )
+                        }
                         className="mt-3 w-full py-2 rounded-lg bg-[var(--accent-blue)] text-white text-xs font-medium hover:bg-[var(--accent-blue-hover)] transition-colors"
                       >
                         Yol Tarifi Al
                       </button>
+
                     </div>
+
                   </Popup>
+
                 </Marker>
               ))}
+
             </MapContainer>
+
           )}
+
         </motion.div>
       </div>
     </section>
