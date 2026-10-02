@@ -51,22 +51,31 @@ export default async function handler(req: any, res: any) {
       "https://api.onesignal.com/notifications",
       {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json",
           Authorization: `Key ${restApiKey}`,
         },
+
         body: JSON.stringify({
           app_id: "3628049c-37d2-483e-afe9-f6eafae5761a",
+
           include_subscription_ids: playerIds,
+
           headings: {
             tr: "🚨 Acil Durum",
             en: "🚨 Emergency",
           },
+
           contents: {
             tr: "Yakınınızda CPR/OED ihtiyacı var!",
             en: "CPR/AED assistance is needed near you!",
           },
-          url: `https://enyakinoedv2.vercel.app/?lat=${latitude}&lng=${longitude}`,
+
+          data: {
+            latitude,
+            longitude,
+          },
         }),
       }
     );
