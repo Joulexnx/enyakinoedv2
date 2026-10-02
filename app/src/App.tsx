@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ThemeProvider } from '@/hooks/useTheme';
 import { useGeolocation } from '@/hooks/useGeolocation';
+import { useVolunteerTracking } from '@/hooks/useVolunteerTracking';
 
 import { HeaderBar } from '@/sections/HeaderBar';
 import { EmergencyAlertBanner } from '@/sections/EmergencyAlertBanner';
@@ -18,6 +19,10 @@ import { VolunteersPanel } from '@/components/VolunteersPanel';
 import { EmergencyCallButton } from '@/components/EmergencyCallButton';
 
 function HomePage() {
+  // Gönüllü kayıtlıysa canlı GPS takibini başlatır.
+  // Konum değiştikçe Supabase'deki lat/lng/updated_at güncellenir.
+  useVolunteerTracking();
+
   const {
     status,
     userLocation,
@@ -27,7 +32,8 @@ function HomePage() {
     requestLocation,
   } = useGeolocation();
 
-  const [showVolunteerModal, setShowVolunteerModal] = useState(false);
+  const [showVolunteerModal, setShowVolunteerModal] =
+    useState(false);
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
@@ -36,7 +42,9 @@ function HomePage() {
       <EmergencyAlertBanner />
 
       <main>
-        <HeroSection onRequestLocation={requestLocation} />
+        <HeroSection
+          onRequestLocation={requestLocation}
+        />
 
         <StatisticsDashboard
           nearestDistance={nearestDistance}
@@ -51,9 +59,13 @@ function HomePage() {
         />
 
         {/* GÖNÜLLÜLER */}
-        <VolunteersPanel userLocation={userLocation} />
+        <VolunteersPanel
+          userLocation={userLocation}
+        />
 
-        <NearbyOEDList oedLocations={sortedOEDs} />
+        <NearbyOEDList
+          oedLocations={sortedOEDs}
+        />
 
         <InformationPanel />
 
@@ -64,17 +76,26 @@ function HomePage() {
 
       {/* GÖNÜLLÜ OL BUTONU */}
       <button
-        onClick={() => setShowVolunteerModal(true)}
+        onClick={() =>
+          setShowVolunteerModal(true)
+        }
         className="fixed bottom-24 sm:bottom-8 right-4 sm:right-8 z-50 flex items-center gap-2 px-5 py-3.5 rounded-full bg-[var(--accent-green)] text-white font-bold shadow-lg hover:scale-105 active:scale-95 transition-all"
       >
-        <span className="text-lg">❤️</span>
-        <span className="text-sm">Gönüllü Ol</span>
+        <span className="text-lg">
+          ❤️
+        </span>
+
+        <span className="text-sm">
+          Gönüllü Ol
+        </span>
       </button>
 
       {/* GÖNÜLLÜ KAYIT MODALI */}
       <VolunteerModal
         isOpen={showVolunteerModal}
-        onClose={() => setShowVolunteerModal(false)}
+        onClose={() =>
+          setShowVolunteerModal(false)
+        }
         userLocation={userLocation}
       />
 
@@ -87,7 +108,11 @@ function HomePage() {
 }
 
 export default function App() {
-  const path = window.location.pathname.replace(/\/+$/, '') || '/';
+  const path =
+    window.location.pathname.replace(
+      /\/+$/,
+      ''
+    ) || '/';
 
   return (
     <ThemeProvider>
