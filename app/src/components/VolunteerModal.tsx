@@ -51,7 +51,9 @@ export function VolunteerModal({
     }
 
     if (!navigator.geolocation) {
-      throw new Error('Cihazınız konum bilgisini desteklemiyor.');
+      throw new Error(
+        'Cihazınız konum bilgisini desteklemiyor.'
+      );
     }
 
     return new Promise<{ lat: number; lng: number }>(
@@ -104,9 +106,14 @@ export function VolunteerModal({
         .single();
 
       if (error) {
-        console.error('Supabase volunteer registration error:', error);
+        console.error(
+          'Supabase volunteer registration error:',
+          error
+        );
+
         throw new Error(
-          error.message || 'Gönüllü kaydı oluşturulamadı.'
+          error.message ||
+            'Gönüllü kaydı oluşturulamadı.'
         );
       }
 
@@ -125,6 +132,12 @@ export function VolunteerModal({
       localStorage.setItem(
         'volunteer_registered',
         'true'
+      );
+
+      // Canlı GPS takibine yeni gönüllünün
+      // kayıt olduğunu bildir.
+      window.dispatchEvent(
+        new Event('volunteer-registered')
       );
 
       setStep('success');
@@ -213,7 +226,12 @@ export function VolunteerModal({
             }}
             transition={{
               duration: 0.3,
-              ease: [0.22, 1, 0.36, 1] as [
+              ease: [
+                0.22,
+                1,
+                0.36,
+                1,
+              ] as [
                 number,
                 number,
                 number,
@@ -221,7 +239,9 @@ export function VolunteerModal({
               ],
             }}
             className="bg-white dark:bg-[#161823] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) =>
+              e.stopPropagation()
+            }
           >
             {/* HEADER */}
 
@@ -251,7 +271,6 @@ export function VolunteerModal({
             </div>
 
             <div className="p-6">
-
               {/* FORM */}
 
               {step === 'form' && (
@@ -351,7 +370,9 @@ export function VolunteerModal({
 
                   <div className="flex flex-col gap-3">
                     <button
-                      onClick={handleEnablePush}
+                      onClick={
+                        handleEnablePush
+                      }
                       disabled={loading}
                       className="w-full py-3.5 rounded-xl bg-[var(--accent-blue)] text-white font-semibold hover:bg-[var(--accent-blue-hover)] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
@@ -367,7 +388,9 @@ export function VolunteerModal({
                     </button>
 
                     <button
-                      onClick={handleSkipPush}
+                      onClick={
+                        handleSkipPush
+                      }
                       disabled={loading}
                       className="w-full py-3 rounded-xl border border-[var(--border)] text-[var(--text-muted)] font-medium hover:bg-[var(--border-subtle)] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
@@ -384,8 +407,12 @@ export function VolunteerModal({
               {step === 'success' && (
                 <div className="text-center space-y-5">
                   <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
+                    initial={{
+                      scale: 0,
+                    }}
+                    animate={{
+                      scale: 1,
+                    }}
                     transition={{
                       type: 'spring',
                       damping: 15,
@@ -437,7 +464,9 @@ export function VolunteerModal({
 
                   <div className="flex gap-3">
                     <button
-                      onClick={() => setStep('form')}
+                      onClick={() =>
+                        setStep('form')
+                      }
                       className="flex-1 py-3 rounded-xl bg-[var(--accent-blue)] text-white font-medium hover:bg-[var(--accent-blue-hover)] transition-all"
                     >
                       Tekrar Dene
