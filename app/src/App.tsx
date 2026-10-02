@@ -79,7 +79,7 @@ function HomePage() {
         onClick={() =>
           setShowVolunteerModal(true)
         }
-        className="fixed bottom-24 sm:bottom-8 right-4 sm:right-8 z-50 flex items-center gap-2 px-5 py-3.5 rounded-full bg-[var(--accent-green)] text-white font-bold shadow-lg hover:scale-105 active:scale-95 transition-all"
+        className="fixed bottom-4 sm:bottom-8 right-4 sm:right-8 z-50 flex items-center gap-2 px-5 py-3.5 rounded-full bg-[var(--accent-green)] text-white font-bold shadow-lg hover:scale-105 active:scale-95 transition-all"
       >
         <span className="text-lg">
           ❤️
