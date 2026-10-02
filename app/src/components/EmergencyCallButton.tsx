@@ -37,7 +37,6 @@ interface EmergencyResult {
 }
 
 const RADIUS_METERS = 1000;
-const ACTIVE_WINDOW_MS = 2 * 60 * 1000;
 
 function calculateDistance(
   lat1: number,
@@ -104,27 +103,15 @@ export function EmergencyCallButton({
       throw error;
     }
 
-    const now = Date.now();
-
     return ((data ?? []) as VolunteerRow[])
-      .filter((volunteer) => {
-        if (
-          volunteer.lat === null ||
-          volunteer.lng === null ||
-          !volunteer.updated_at
-        ) {
-          return false;
-        }
+  .filter((volunteer) => {
+    return (
+      volunteer.lat !== null &&
+      volunteer.lng !== null &&
+      Boolean(volunteer.player_id)
+    );
+  })    
 
-        const updatedAt = new Date(
-          volunteer.updated_at
-        ).getTime();
-
-        return (
-          Number.isFinite(updatedAt) &&
-          now - updatedAt <= ACTIVE_WINDOW_MS
-        );
-      })
       .map((volunteer) => ({
         ...volunteer,
         distance: calculateDistance(
