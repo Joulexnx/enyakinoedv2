@@ -221,6 +221,8 @@ function ListingApplicationModal({
   onClose: () => void;
 }) {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   const [form, setForm] = useState({
     centerName: '',
@@ -254,23 +256,99 @@ function ListingApplicationModal({
     }));
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (
+    event: React.FormEvent
+  ) => {
     event.preventDefault();
 
+    setError('');
+
     if (
-      !form.centerName ||
-      !form.representative ||
-      !form.phone ||
-      !form.email ||
+      !form.centerName.trim() ||
+      !form.representative.trim() ||
+      !form.phone.trim() ||
+      !form.email.trim() ||
       !form.district ||
-      !form.address ||
+      !form.address.trim() ||
       selectedCourses.length === 0 ||
       !form.kvkk
     ) {
+      setError(
+        'Lütfen zorunlu alanların tamamını doldurun ve onay kutusunu işaretleyin.'
+      );
       return;
     }
 
-    setSubmitted(true);
+    setSubmitting(true);
+
+    try {
+      const GOOGLE_SCRIPT_URL =
+        'https://script.google.com/macros/s/AKfycbwlqLqvv3skmRkrrorY1poncnQHEThiSEq0kC8oSMaKyeNGxKtdxPjdjYp7fUXKJjCUOw/exec';
+
+      const payload = {
+        centerName: form.centerName.trim(),
+        representative: form.representative.trim(),
+        phone: form.phone.trim(),
+        email: form.email.trim(),
+        district: form.district,
+        address: form.address.trim(),
+        website: form.website.trim(),
+        courses: selectedCourses.join(', '),
+        description: form.description.trim(),
+        kvkk: form.kvkk,
+      };
+
+      const response = await fetch(
+        GOOGLE_SCRIPT_URL,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8',
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          'Başvuru gönderilemedi.'
+        );
+      }
+
+      let result: {
+        success?: boolean;
+        message?: string;
+      } | null = null;
+
+      try {
+        result = await response.json();
+      } catch {
+        result = null;
+      }
+
+      if (
+        result &&
+        result.success === false
+      ) {
+        throw new Error(
+          result.message ||
+            'Başvuru kaydedilemedi.'
+        );
+      }
+
+      setSubmitted(true);
+    } catch (submitError) {
+      console.error(
+        'Kurs başvuru gönderim hatası:',
+        submitError
+      );
+
+      setError(
+        'Başvuru gönderilirken bir sorun oluştu. Lütfen tekrar deneyin.'
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -282,11 +360,10 @@ function ListingApplicationModal({
     >
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
+        onClick={submitting ? undefined : onClose}
       />
 
       <div className="relative w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-3xl bg-white dark:bg-[var(--bg-card)] shadow-2xl border border-[var(--border-subtle)] text-slate-900 dark:text-white">
-        {/* MODAL HEADER */}
         <div className="sticky top-0 z-10 flex items-center justify-between gap-4 px-5 sm:px-7 py-4 border-b border-[var(--border-subtle)] bg-white dark:bg-[var(--bg-card)] backdrop-blur-xl">
           <div>
             <div className="flex items-center gap-2 text-[var(--accent-blue)] text-xs font-semibold">
@@ -305,7 +382,8 @@ function ListingApplicationModal({
           <button
             type="button"
             onClick={onClose}
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-colors"
+            disabled={submitting}
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-colors disabled:opacity-40"
             aria-label="Kapat"
           >
             <X className="w-5 h-5" />
@@ -319,13 +397,13 @@ function ListingApplicationModal({
             </div>
 
             <h3 className="mt-6 text-2xl font-bold text-slate-900 dark:text-white">
-              Başvurunuz hazırlandı
+              Başvurunuz başarıyla alındı
             </h3>
 
             <p className="mt-3 max-w-md mx-auto text-sm text-[var(--text-secondary)] leading-relaxed">
-              Eğitim merkezi bilgileriniz başarıyla alındı. Başvuru sistemi
-              bağlantısı tamamlandığında bu bilgiler doğrudan platforma
-              iletilecek.
+              Eğitim merkezi bilgileriniz başvuru sistemimize
+              kaydedildi. Başvurunuz incelendikten sonra
+              yayınlama süreci için sizinle iletişime geçilebilir.
             </p>
 
             <button
@@ -339,7 +417,6 @@ function ListingApplicationModal({
         ) : (
           <form onSubmit={handleSubmit}>
             <div className="p-5 sm:p-7 space-y-7">
-              {/* BİLGİ */}
               <div className="rounded-2xl bg-[rgba(23,106,246,0.06)] border border-[rgba(23,106,246,0.12)] p-4">
                 <div className="flex items-start gap-3">
                   <ShieldCheck className="w-5 h-5 text-[var(--accent-blue)] mt-0.5 flex-shrink-0" />
@@ -358,7 +435,6 @@ function ListingApplicationModal({
                 </div>
               </div>
 
-              {/* MERKEZ BİLGİLERİ */}
               <section>
                 <div className="flex items-center gap-2 mb-4">
                   <Building2 className="w-5 h-5 text-[var(--accent-blue)]" />
@@ -417,7 +493,6 @@ function ListingApplicationModal({
                 </div>
               </section>
 
-              {/* KONUM */}
               <section>
                 <div className="flex items-center gap-2 mb-4">
                   <MapPin className="w-5 h-5 text-[var(--accent-blue)]" />
@@ -429,7 +504,9 @@ function ListingApplicationModal({
 
                 <div className="space-y-4">
                   <div>
-                    <FieldLabel required>İlçe</FieldLabel>
+                    <FieldLabel required>
+                      İlçe
+                    </FieldLabel>
 
                     <div className="relative">
                       <select
@@ -443,14 +520,18 @@ function ListingApplicationModal({
                         className="appearance-none w-full h-12 px-4 pr-10 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-slate-900 dark:text-white outline-none focus:border-[var(--accent-blue)] focus:ring-2 focus:ring-[rgba(23,106,246,0.12)] transition-all cursor-pointer"
                         required
                       >
-                        <option value="" className="text-slate-900">
+                        <option
+                          value=""
+                          className="text-slate-900"
+                        >
                           İlçe seçin
                         </option>
 
                         {districts
                           .filter(
                             (district) =>
-                              district !== 'Tüm İlçeler'
+                              district !==
+                              'Tüm İlçeler'
                           )
                           .map((district) => (
                             <option
@@ -500,7 +581,6 @@ function ListingApplicationModal({
                 </div>
               </section>
 
-              {/* EĞİTİMLER */}
               <section>
                 <div className="flex items-center gap-2 mb-4">
                   <BookOpen className="w-5 h-5 text-[var(--accent-blue)]" />
@@ -554,7 +634,6 @@ function ListingApplicationModal({
                 </div>
               </section>
 
-              {/* AÇIKLAMA */}
               <section>
                 <div className="flex items-center gap-2 mb-4">
                   <FileText className="w-5 h-5 text-[var(--accent-blue)]" />
@@ -578,7 +657,6 @@ function ListingApplicationModal({
                 />
               </section>
 
-              {/* ONAY */}
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -599,30 +677,49 @@ function ListingApplicationModal({
                   <span className="text-red-500 ml-1">*</span>
                 </span>
               </label>
+
+              {error && (
+                <div className="rounded-xl border border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-red-500/10 px-4 py-3">
+                  <p className="text-sm text-red-600 dark:text-red-400">
+                    {error}
+                  </p>
+                </div>
+              )}
             </div>
 
-            {/* FORM FOOTER */}
             <div className="sticky bottom-0 border-t border-[var(--border-subtle)] bg-white dark:bg-[var(--bg-card)] backdrop-blur-xl px-5 sm:px-7 py-4">
               <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
                 <p className="text-xs text-[var(--text-secondary)]">
-                  <span className="text-red-500">*</span> Zorunlu alanlar
+                  <span className="text-red-500">*</span>{' '}
+                  Zorunlu alanlar
                 </p>
 
                 <div className="flex gap-3">
                   <button
                     type="button"
                     onClick={onClose}
-                    className="h-11 px-5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-transparent text-slate-900 dark:text-white text-sm font-medium hover:bg-slate-100 dark:hover:bg-white/10 transition-all"
+                    disabled={submitting}
+                    className="h-11 px-5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-transparent text-slate-900 dark:text-white text-sm font-medium hover:bg-slate-100 dark:hover:bg-white/10 transition-all disabled:opacity-50"
                   >
                     Vazgeç
                   </button>
 
                   <button
                     type="submit"
-                    className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-xl bg-[var(--accent-blue)] text-white text-sm font-semibold hover:brightness-95 transition-all shadow-sm"
+                    disabled={submitting}
+                    className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-xl bg-[var(--accent-blue)] text-white text-sm font-semibold hover:brightness-95 transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    <Send className="w-4 h-4" />
-                    Başvuruyu Gönder
+                    {submitting ? (
+                      <>
+                        <span className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+                        Gönderiliyor...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        Başvuruyu Gönder
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
@@ -667,7 +764,6 @@ export default function FirstAidCourses() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-slate-900 dark:text-white">
-      {/* HEADER */}
       <header className="sticky top-0 z-50 border-b border-[var(--border-subtle)] bg-white/90 dark:bg-[var(--bg-card)]/90 backdrop-blur-xl">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
           <div className="h-16 flex items-center justify-between">
@@ -702,7 +798,6 @@ export default function FirstAidCourses() {
       </header>
 
       <main>
-        {/* HERO */}
         <section className="relative overflow-hidden">
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6 pt-14 sm:pt-20 pb-12 sm:pb-16">
             <div className="max-w-4xl mx-auto text-center">
@@ -722,7 +817,6 @@ export default function FirstAidCourses() {
                 alan eğitim merkezlerini keşfedin.
               </p>
 
-              {/* SEARCH + FILTER */}
               <div className="mt-8 max-w-3xl mx-auto">
                 <div className="grid grid-cols-1 sm:grid-cols-[1fr_190px] gap-3">
                   <div className="relative">
@@ -763,7 +857,6 @@ export default function FirstAidCourses() {
                 </div>
               </div>
 
-              {/* QUICK STATS */}
               <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-xs sm:text-sm text-[var(--text-secondary)]">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
@@ -784,7 +877,6 @@ export default function FirstAidCourses() {
           </div>
         </section>
 
-        {/* COURSE TYPES */}
         <section className="py-10 sm:py-14 bg-white dark:bg-[var(--bg-card)] border-y border-[var(--border-subtle)]">
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-8">
@@ -826,7 +918,6 @@ export default function FirstAidCourses() {
           </div>
         </section>
 
-        {/* COURSE CENTERS */}
         <section className="py-12 sm:py-16">
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-7">
@@ -904,7 +995,6 @@ export default function FirstAidCourses() {
           </div>
         </section>
 
-        {/* COURSE CENTER LISTING CTA */}
         <section
           id="course-listing"
           className="py-12 sm:py-16 bg-white dark:bg-[var(--bg-card)] border-y border-[var(--border-subtle)]"
@@ -966,7 +1056,6 @@ export default function FirstAidCourses() {
           </div>
         </section>
 
-        {/* INFO */}
         <section className="py-12 sm:py-16">
           <div className="max-w-[900px] mx-auto px-4 sm:px-6 text-center">
             <div className="w-12 h-12 mx-auto rounded-2xl bg-[rgba(23,106,246,0.08)] text-[var(--accent-blue)] flex items-center justify-center">
@@ -988,7 +1077,6 @@ export default function FirstAidCourses() {
         </section>
       </main>
 
-      {/* FOOTER */}
       <footer className="py-8 border-t border-[var(--border-subtle)] bg-[var(--bg-primary)]">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -1004,7 +1092,6 @@ export default function FirstAidCourses() {
         </div>
       </footer>
 
-      {/* APPLICATION MODAL */}
       {isApplicationOpen && (
         <ListingApplicationModal
           onClose={() => setIsApplicationOpen(false)}
