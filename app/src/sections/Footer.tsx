@@ -50,32 +50,88 @@ const termsContent = [
   },
 ];
 
-function LegalModal({ type, onClose }: { type: ModalType; onClose: () => void }) {
+function LegalModal({
+  type,
+  onClose,
+}: {
+  type: ModalType;
+  onClose: () => void;
+}) {
   if (!type) return null;
+
   const isPrivacy = type === 'privacy';
-  const title = isPrivacy ? 'Gizlilik Politikası' : 'Kullanım Koşulları';
-  const content = isPrivacy ? privacyContent : termsContent;
+  const title = isPrivacy
+    ? 'Gizlilik Politikası'
+    : 'Kullanım Koşulları';
+
+  const content = isPrivacy
+    ? privacyContent
+    : termsContent;
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-      onClick={onClose}>
-      <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.9, opacity: 0, y: 20 }}
-        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{
+          scale: 0.9,
+          opacity: 0,
+          y: 20,
+        }}
+        animate={{
+          scale: 1,
+          opacity: 1,
+          y: 0,
+        }}
+        exit={{
+          scale: 0.9,
+          opacity: 0,
+          y: 20,
+        }}
+        transition={{
+          duration: 0.3,
+          ease: [
+            0.22,
+            1,
+            0.36,
+            1,
+          ] as [
+            number,
+            number,
+            number,
+            number
+          ],
+        }}
         className="bg-white dark:bg-[#161823] rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden"
-        onClick={(e) => e.stopPropagation()}>
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-subtle)] flex-shrink-0">
-          <h3 className="text-lg font-semibold text-[var(--text-primary)]">{title}</h3>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-[var(--border-subtle)] transition-colors">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">
+            {title}
+          </h3>
+
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg hover:bg-[var(--border-subtle)] transition-colors"
+          >
             <X className="w-5 h-5 text-[var(--text-muted)]" />
           </button>
         </div>
+
         <div className="p-6 overflow-y-auto custom-scrollbar space-y-5">
           {content.map((section, i) => (
             <div key={i}>
-              <h4 className="text-sm font-semibold text-[var(--text-primary)] mb-1.5">{section.title}</h4>
-              <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{section.text}</p>
+              <h4 className="text-sm font-semibold text-[var(--text-primary)] mb-1.5">
+                {section.title}
+              </h4>
+
+              <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+                {section.text}
+              </p>
             </div>
           ))}
         </div>
@@ -85,30 +141,48 @@ function LegalModal({ type, onClose }: { type: ModalType; onClose: () => void })
 }
 
 export function Footer() {
-  const [modal, setModal] = useState<ModalType>(null);
+  const [modal, setModal] =
+    useState<ModalType>(null);
 
   return (
     <>
       <footer className="py-6 bg-white dark:bg-[var(--bg-card)] border-t border-[var(--border-subtle)]">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+
           <p className="text-xs text-[var(--text-muted)] text-center sm:text-left">
-            &copy; 2025 En Yakın OED — Hayat kurtarmak için geliştirildi
+            &copy; 2026 En Yakın OED — Hayat kurtarmak için geliştirildi
           </p>
+
           <div className="flex items-center gap-4">
-            <button onClick={() => setModal('privacy')}
-              className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
+            <button
+              onClick={() => setModal('privacy')}
+              className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+            >
               Gizlilik Politikası
             </button>
-            <span className="text-xs text-[var(--text-muted)]">·</span>
-            <button onClick={() => setModal('terms')}
-              className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
+
+            <span className="text-xs text-[var(--text-muted)]">
+              ·
+            </span>
+
+            <button
+              onClick={() => setModal('terms')}
+              className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+            >
               Kullanım Koşulları
             </button>
           </div>
+
         </div>
       </footer>
+
       <AnimatePresence>
-        {modal && <LegalModal type={modal} onClose={() => setModal(null)} />}
+        {modal && (
+          <LegalModal
+            type={modal}
+            onClose={() => setModal(null)}
+          />
+        )}
       </AnimatePresence>
     </>
   );

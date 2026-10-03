@@ -77,9 +77,8 @@ export function HeroSection({
               variants={itemVariants}
               className="mt-4 text-base sm:text-lg text-[var(--text-secondary)] leading-relaxed"
             >
-              Ankara'da ani kalp durması durumunda en yakın
-              otomatik eksternal defibrilatörü (OED) anında
-              bulun. 25 noktada hizmetinizdeyiz.
+              Ankara'da ani kalp durması durumunda size en yakın
+              otomatik eksternal defibrilatörü (OED) kolayca bulun.
             </motion.p>
 
             {/* AKSİYONLAR */}
