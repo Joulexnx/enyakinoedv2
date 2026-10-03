@@ -173,13 +173,6 @@ export function MapSection({
   const [isMapReady, setIsMapReady] =
     useState(false);
 
-  /*
-   * Bildirim ile açıldıysa URL'deki
-   * acil durum koordinatlarını alıyoruz.
-   *
-   * Örnek:
-   * /?lat=39.9195&lng=32.8704
-   */
   const emergencyLocation = useMemo(() => {
     const params = new URLSearchParams(
       window.location.search
@@ -206,13 +199,6 @@ export function MapSection({
       return null;
     }
 
-    /*
-     * Koordinatı okuduktan sonra URL'deki
-     * lat/lng değerlerini temizliyoruz.
-     *
-     * Böylece sayfa yenilendiğinde eski
-     * acil durum marker'ı tekrar gelmez.
-     */
     window.history.replaceState(
       {},
       document.title,
@@ -225,10 +211,6 @@ export function MapSection({
     ];
   }, []);
 
-  /*
-   * Acil bildirimle açıldıysa
-   * kullanıcıyı doğrudan haritaya götür.
-   */
   useEffect(() => {
     if (!emergencyLocation) {
       return;
@@ -249,9 +231,6 @@ export function MapSection({
     mapRef,
   ]);
 
-  /*
-   * Haritanın ilk açılacağı merkez.
-   */
   const mapCenter = useMemo(() => {
     if (emergencyLocation) {
       return emergencyLocation;
@@ -270,9 +249,6 @@ export function MapSection({
     emergencyLocation,
   ]);
 
-  /*
-   * Haritanın yüklenme animasyonu.
-   */
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsMapReady(true);
@@ -284,10 +260,12 @@ export function MapSection({
   }, []);
 
   return (
-    <section className="pt-10 pb-12 sm:pb-16 px-4 sm:px-6">
+    <section
+      id="oed-map"
+      className="pt-10 pb-12 sm:pb-16 px-4 sm:px-6 scroll-mt-24"
+    >
       <div className="max-w-[1200px] mx-auto">
 
-        {/* BAŞLIK */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
           <div>
             <h2 className="text-xl sm:text-2xl font-semibold text-[var(--text-primary)] tracking-tight">
@@ -300,7 +278,6 @@ export function MapSection({
           </div>
         </div>
 
-        {/* HARİTA AÇIKLAMA */}
         <div className="flex flex-wrap items-center gap-4 mb-4">
 
           <div className="flex items-center gap-2">
@@ -332,7 +309,6 @@ export function MapSection({
           )}
         </div>
 
-        {/* HARİTA */}
         <motion.div
           ref={mapRef}
           initial={{
@@ -358,7 +334,8 @@ export function MapSection({
           }}
           className="relative rounded-2xl shadow-xl border border-[var(--border)] overflow-hidden bg-[#e5e7eb]"
           style={{
-            height: 'clamp(360px, 52vw, 620px)',
+            height:
+              'clamp(360px, 52vw, 620px)',
           }}
         >
           {!isMapReady ||
@@ -386,20 +363,17 @@ export function MapSection({
               }}
             >
 
-              {/* OPENSTREETMAP */}
               <TileLayer
                 attribution="&copy; OpenStreetMap contributors"
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 maxZoom={19}
               />
 
-              {/* HARİTA KONTROLÜ */}
               <MapController
                 userLocation={userLocation}
                 emergencyLocation={emergencyLocation}
               />
 
-              {/* ACİL DURUM KONUMU */}
               {emergencyLocation && (
                 <Marker
                   position={emergencyLocation}
@@ -419,7 +393,6 @@ export function MapSection({
                 </Marker>
               )}
 
-              {/* KULLANICI KONUMU */}
               {userLocation && (
                 <>
                   <Circle
@@ -458,7 +431,6 @@ export function MapSection({
                 </>
               )}
 
-              {/* OED CİHAZLARI */}
               {oedLocations.map(
                 (oed, index) => (
                   <Marker

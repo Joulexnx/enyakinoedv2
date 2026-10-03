@@ -11,9 +11,12 @@ import { NearbyOEDList } from '@/sections/NearbyOEDList';
 import { InformationPanel } from '@/sections/InformationPanel';
 import { TYDGuide } from '@/sections/TYDGuide';
 import { Footer } from '@/sections/Footer';
+
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
+import FirstAidCourses from '@/pages/FirstAidCourses';
 
 import { VolunteersPanel } from '@/components/VolunteersPanel';
+import { MobileBottomNav } from '@/components/MobileBottomNav';
 
 function HomePage() {
   // Gönüllü sistemi ileride tekrar aktif edilecek.
@@ -30,35 +33,52 @@ function HomePage() {
   } = useGeolocation();
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)]">
+    <div className="min-h-screen bg-[var(--bg-primary)] pb-24 sm:pb-0">
+
       <HeaderBar />
 
       <EmergencyAlertBanner />
 
       <main>
         <HeroSection
-          onRequestLocation={requestLocation}
+          onRequestLocation={
+            requestLocation
+          }
         />
 
         <StatisticsDashboard
-          nearestDistance={nearestDistance}
+          nearestDistance={
+            nearestDistance
+          }
           walkingTime={walkingTime}
         />
 
         <MapSection
-          userLocation={userLocation}
-          geolocationStatus={status}
-          oedLocations={sortedOEDs}
-          onRequestLocation={requestLocation}
+          userLocation={
+            userLocation
+          }
+          geolocationStatus={
+            status
+          }
+          oedLocations={
+            sortedOEDs
+          }
+          onRequestLocation={
+            requestLocation
+          }
         />
 
         {/* GÖNÜLLÜLER */}
         <VolunteersPanel
-          userLocation={userLocation}
+          userLocation={
+            userLocation
+          }
         />
 
         <NearbyOEDList
-          oedLocations={sortedOEDs}
+          oedLocations={
+            sortedOEDs
+          }
         />
 
         <InformationPanel />
@@ -67,6 +87,12 @@ function HomePage() {
       </main>
 
       <Footer />
+
+      {/* SADECE MOBİL */}
+      <MobileBottomNav
+        activeItem="home"
+      />
+
     </div>
   );
 }
@@ -80,11 +106,15 @@ export default function App() {
 
   return (
     <ThemeProvider>
+
       {path === '/gizlilik-politikasi' ? (
         <PrivacyPolicy />
+      ) : path === '/ilk-yardim-kurslari' ? (
+        <FirstAidCourses />
       ) : (
         <HomePage />
       )}
+
     </ThemeProvider>
   );
 }
