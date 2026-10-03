@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Siren,
@@ -104,14 +104,13 @@ export function EmergencyCallButton({
     }
 
     return ((data ?? []) as VolunteerRow[])
-  .filter((volunteer) => {
-    return (
-      volunteer.lat !== null &&
-      volunteer.lng !== null &&
-      Boolean(volunteer.player_id)
-    );
-  })    
-
+      .filter((volunteer) => {
+        return (
+          volunteer.lat !== null &&
+          volunteer.lng !== null &&
+          Boolean(volunteer.player_id)
+        );
+      })
       .map((volunteer) => ({
         ...volunteer,
         distance: calculateDistance(
@@ -214,13 +213,6 @@ export function EmergencyCallButton({
     setErrorMessage(null);
 
     try {
-      /*
-       * Bildirim göndermeden hemen önce
-       * gönüllü listesini yeniden alıyoruz.
-       *
-       * Böylece 5 saniyelik eski liste yerine
-       * mümkün olan en güncel konumları kullanıyoruz.
-       */
       const latestVolunteers =
         await getNearbyVolunteers();
 
@@ -228,10 +220,6 @@ export function EmergencyCallButton({
         latestVolunteers
       );
 
-      /*
-       * OneSignal subscription ID'si olan
-       * gönüllüleri seçiyoruz.
-       */
       const playerIds =
         latestVolunteers
           .map(
@@ -245,10 +233,6 @@ export function EmergencyCallButton({
               Boolean(playerId)
           );
 
-      /*
-       * Yakında gönüllü var ama OneSignal
-       * aboneliği yoksa bildirim gönderemeyiz.
-       */
       if (playerIds.length === 0) {
         setResult({
           notifiedCount: 0,
@@ -259,14 +243,8 @@ export function EmergencyCallButton({
         return;
       }
 
-      /*
-       * Vercel API fonksiyonuna gönderiyoruz.
-       *
-       * API tarafı OneSignal REST API
-       * anahtarını güvenli şekilde kullanıyor.
-       */
       const response = await fetch(
-  'https://enyakinoedv2.vercel.app/api/send-alert',
+        'https://enyakinoedv2.vercel.app/api/send-alert',
         {
           method: 'POST',
 
@@ -293,13 +271,6 @@ export function EmergencyCallButton({
         );
       }
 
-      /*
-       * OneSignal recipients bilgisi
-       * dönerse onu kullanıyoruz.
-       *
-       * Dönmezse gönderdiğimiz subscription
-       * sayısını kullanıyoruz.
-       */
       const notifiedCount =
         typeof data?.data?.recipients ===
         'number'
@@ -340,7 +311,7 @@ export function EmergencyCallButton({
 
   return (
     <>
-      {/* ACİL YARDIMCI ÇAĞIR BUTONU */}
+      {/* ACİL YARDIM - GEÇİCİ OLARAK PASİF */}
 
       <motion.button
         initial={{ scale: 0 }}
@@ -350,17 +321,16 @@ export function EmergencyCallButton({
           type: 'spring',
           damping: 12,
         }}
-        onClick={() =>
-          setShowModal(true)
-        }
-        className="fixed bottom-24 sm:bottom-8 left-4 sm:left-auto sm:right-24 z-50 flex items-center gap-2.5 px-5 py-3.5 rounded-full bg-[var(--accent-red)] text-white font-bold shadow-lg hover:shadow-glow-red hover:scale-105 active:scale-95 transition-all"
+        disabled
+        className="fixed bottom-24 sm:bottom-8 left-4 sm:left-auto sm:right-24 z-50 flex items-center gap-2.5 px-5 py-3.5 rounded-full bg-gray-400 text-white font-bold shadow-md cursor-not-allowed opacity-90"
       >
-        <Siren className="w-5 h-5" />
-
         <span className="text-sm">
-          İlk Yardımcı Çağır
+          🔒 Yakında Aktif
         </span>
       </motion.button>
+
+      {/* MEVCUT ACİL DURUM MODALI
+          Daha sonra tekrar aktif edilebilir. */}
 
       <AnimatePresence>
         {showModal && (
@@ -406,8 +376,6 @@ export function EmergencyCallButton({
                 e.stopPropagation()
               }
             >
-              {/* HEADER */}
-
               <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-subtle)] bg-[var(--accent-red-light)] flex-shrink-0">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-[var(--accent-red)] flex items-center justify-center">
@@ -437,8 +405,6 @@ export function EmergencyCallButton({
                 {!result ? (
                   <div className="space-y-4">
 
-                    {/* 112 UYARISI */}
-
                     <div className="flex items-start gap-3 p-4 rounded-xl bg-[var(--accent-amber-light)]">
                       <AlertTriangle className="w-5 h-5 text-[var(--accent-amber)] flex-shrink-0 mt-0.5" />
 
@@ -453,19 +419,15 @@ export function EmergencyCallButton({
                       </div>
                     </div>
 
-                    {/* GÖNÜLLÜ SAYISI */}
-
                     <div className="p-4 rounded-xl bg-[var(--bg-primary)] dark:bg-[#0D0F18]">
                       <p className="text-sm font-medium text-[var(--text-primary)] mb-2">
                         <MapPin className="w-4 h-4 inline mr-1" />
-
                         1000m içindeki aktif gönüllüler:
                       </p>
 
                       {isLoadingVolunteers ? (
                         <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
                           <Loader2 className="w-4 h-4 animate-spin" />
-
                           Aranıyor...
                         </div>
                       ) : nearbyVolunteers.length > 0 ? (
@@ -480,8 +442,6 @@ export function EmergencyCallButton({
                       )}
                     </div>
 
-                    {/* SERVICE WORKER DURUMU */}
-
                     <div className="p-2 rounded-lg bg-[var(--bg-primary)] dark:bg-[#0D0F18] text-xs">
                       <p className="text-[var(--text-muted)]">
                         Service Worker:{' '}
@@ -490,24 +450,18 @@ export function EmergencyCallButton({
                       </p>
                     </div>
 
-                    {/* HATA */}
-
                     {errorMessage && (
                       <div className="p-3 rounded-lg bg-[var(--accent-red-light)] text-xs text-[var(--accent-red)]">
                         {errorMessage}
                       </div>
                     )}
 
-                    {/* BUTONLAR */}
-
                     <div className="flex gap-3">
-
                       <a
                         href="tel:112"
                         className="flex-1 py-3.5 rounded-xl bg-[var(--accent-red)] text-white font-bold text-center hover:bg-[var(--accent-red-hover)] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                       >
                         <Phone className="w-5 h-5" />
-
                         112'yi Ara
                       </a>
 
@@ -537,8 +491,6 @@ export function EmergencyCallButton({
                   </div>
                 ) : (
                   <div className="space-y-4">
-
-                    {/* SONUÇ */}
 
                     <div className="text-center">
                       <motion.div
@@ -578,8 +530,6 @@ export function EmergencyCallButton({
                       )}
                     </div>
 
-                    {/* GÖNÜLLÜ LİSTESİ */}
-
                     {result.nearbyVolunteers
                       .length > 0 && (
                       <div className="space-y-2 max-h-56 overflow-y-auto custom-scrollbar">
@@ -599,9 +549,7 @@ export function EmergencyCallButton({
                               <div className="w-8 h-8 rounded-full bg-[var(--accent-green-light)] flex items-center justify-center flex-shrink-0">
                                 <span className="text-xs font-bold text-[var(--accent-green)]">
                                   {volunteer.name
-                                    .charAt(
-                                      0
-                                    )
+                                    .charAt(0)
                                     .toUpperCase()}
                                 </span>
                               </div>
@@ -629,15 +577,11 @@ export function EmergencyCallButton({
                       </div>
                     )}
 
-                    {/* HATA */}
-
                     {errorMessage && (
                       <div className="p-3 rounded-lg bg-[var(--accent-red-light)] text-xs text-[var(--accent-red)]">
                         {errorMessage}
                       </div>
                     )}
-
-                    {/* KAPAT */}
 
                     <button
                       onClick={reset}

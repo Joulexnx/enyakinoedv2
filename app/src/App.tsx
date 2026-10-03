@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { ThemeProvider } from '@/hooks/useTheme';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useVolunteerTracking } from '@/hooks/useVolunteerTracking';
@@ -19,8 +18,8 @@ import { VolunteersPanel } from '@/components/VolunteersPanel';
 import { EmergencyCallButton } from '@/components/EmergencyCallButton';
 
 function HomePage() {
-  // Gönüllü kayıtlıysa canlı GPS takibini başlatır.
-  // Konum değiştikçe Supabase'deki lat/lng/updated_at güncellenir.
+  // Gönüllü kayıt sistemi ileride tekrar aktif edilecek.
+  // Mevcut GPS takip sistemi korunuyor.
   useVolunteerTracking();
 
   const {
@@ -31,9 +30,6 @@ function HomePage() {
     sortedOEDs,
     requestLocation,
   } = useGeolocation();
-
-  const [showVolunteerModal, setShowVolunteerModal] =
-    useState(false);
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
@@ -74,28 +70,25 @@ function HomePage() {
 
       <Footer />
 
-      {/* GÖNÜLLÜ OL BUTONU */}
+      {/* GÖNÜLLÜ OL - GEÇİCİ OLARAK PASİF */}
       <button
-        onClick={() =>
-          setShowVolunteerModal(true)
-        }
-        className="fixed bottom-4 sm:bottom-8 right-4 sm:right-8 z-50 flex items-center gap-2 px-5 py-3.5 rounded-full bg-[var(--accent-green)] text-white font-bold shadow-lg hover:scale-105 active:scale-95 transition-all"
+        disabled
+        className="fixed bottom-4 sm:bottom-8 right-4 sm:right-8 z-50 flex items-center gap-2 px-5 py-3.5 rounded-full bg-gray-400 text-white font-bold shadow-md cursor-not-allowed opacity-90"
       >
         <span className="text-lg">
-          ❤️
+          🔒
         </span>
 
         <span className="text-sm">
-          Gönüllü Ol
+          Yakında Aktif
         </span>
       </button>
 
-      {/* GÖNÜLLÜ KAYIT MODALI */}
+      {/* GÖNÜLLÜ KAYIT MODALI
+          Daha sonra tekrar aktif edilebilir. */}
       <VolunteerModal
-        isOpen={showVolunteerModal}
-        onClose={() =>
-          setShowVolunteerModal(false)
-        }
+        isOpen={false}
+        onClose={() => {}}
         userLocation={userLocation}
       />
 
