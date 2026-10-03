@@ -52,7 +52,6 @@ export function MobileBottomNav({
     useState(activeItem);
 
   const handleNavigation = (action: string) => {
-    /* ANA SAYFA */
     if (action === 'home') {
       setCurrentItem('home');
 
@@ -72,7 +71,6 @@ export function MobileBottomNav({
       return;
     }
 
-    /* HARİTA */
     if (action === 'map') {
       setCurrentItem('map');
 
@@ -97,7 +95,6 @@ export function MobileBottomNav({
       return;
     }
 
-    /* CİHAZLAR */
     if (action === 'devices') {
       setCurrentItem('devices');
 
@@ -122,7 +119,6 @@ export function MobileBottomNav({
       return;
     }
 
-    /* BİLGİ */
     if (action === 'info') {
       setCurrentItem('info');
 
@@ -147,7 +143,6 @@ export function MobileBottomNav({
       return;
     }
 
-    /* KURSLAR */
     if (action === 'courses') {
       setCurrentItem('courses');
 
@@ -165,19 +160,26 @@ export function MobileBottomNav({
 
   return (
     <>
-      {/* SABİT MOBİL ALT MENÜ */}
+      {/* MOBİL ALT NAVİGASYON */}
       <nav
         className="
           fixed
-          bottom-0
           left-0
           right-0
+          bottom-0
           z-[70]
           sm:hidden
+          pointer-events-none
         "
         aria-label="Mobil navigasyon"
       >
-        <div className="mx-2 mb-2">
+        <div
+          className="
+            mx-2
+            mb-2
+            pointer-events-auto
+          "
+        >
           <div
             className="
               relative
@@ -223,7 +225,6 @@ export function MobileBottomNav({
                         : undefined
                     }
                   >
-                    {/* SADECE AKTİF ÖĞENİN ARKA PLANI */}
                     {isActive && (
                       <div
                         className="
@@ -237,7 +238,6 @@ export function MobileBottomNav({
                       />
                     )}
 
-                    {/* SADECE AKTİF ÖĞENİN ÜST ÇİZGİSİ */}
                     {isActive && (
                       <div
                         className="
@@ -251,7 +251,6 @@ export function MobileBottomNav({
                       />
                     )}
 
-                    {/* İKON */}
                     <div
                       className={`
                         relative
@@ -280,7 +279,6 @@ export function MobileBottomNav({
                       />
                     </div>
 
-                    {/* YAZI */}
                     <span
                       className={`
                         relative
@@ -304,7 +302,6 @@ export function MobileBottomNav({
               })}
             </div>
 
-            {/* TELEFON GÜVENLİ ALANI */}
             <div
               className="
                 h-[env(safe-area-inset-bottom)]
@@ -315,13 +312,14 @@ export function MobileBottomNav({
         </div>
       </nav>
 
-      {/* ALT MENÜ İÇİN SAYFA BOŞLUĞU
-          İçeriğin barın altında kalmasını engeller */}
+      {/* MOBİL ALT GÜVENLİ ALAN */}
       <div
         className="
-          h-[92px]
           sm:hidden
+          h-[104px]
+          w-full
           pointer-events-none
+          bg-transparent
         "
         aria-hidden="true"
       />
