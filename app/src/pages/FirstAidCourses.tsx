@@ -473,192 +473,473 @@ function CourseCenterCard({
   const isPremium =
     center.package.toLocaleLowerCase('tr-TR') === 'premium';
 
+  const galleryImages = center.gallery.filter(Boolean);
+
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+
+  const hasGallery = isPremium && galleryImages.length > 0;
+  const galleryCount = galleryImages.length;
+
+  const nextImage = () => {
+    if (galleryCount < 2) return;
+
+    setActiveImageIndex((current) =>
+      current === galleryCount - 1 ? 0 : current + 1,
+    );
+  };
+
+  const previousImage = () => {
+    if (galleryCount < 2) return;
+
+    setActiveImageIndex((current) =>
+      current === 0 ? galleryCount - 1 : current - 1,
+    );
+  };
+
+  const openLightbox = () => {
+    if (!hasGallery) return;
+    setIsLightboxOpen(true);
+  };
+
+  const closeLightbox = () => {
+    setIsLightboxOpen(false);
+  };
+
+  const handleTouchStart = (
+    event: React.TouchEvent<HTMLDivElement>,
+  ) => {
+    setTouchStartX(event.touches[0]?.clientX ?? null);
+  };
+
+  const handleTouchEnd = (
+    event: React.TouchEvent<HTMLDivElement>,
+  ) => {
+    if (touchStartX === null || galleryCount < 2) {
+      setTouchStartX(null);
+      return;
+    }
+
+    const endX = event.changedTouches[0]?.clientX ?? touchStartX;
+    const difference = touchStartX - endX;
+
+    if (Math.abs(difference) > 45) {
+      if (difference > 0) {
+        nextImage();
+      } else {
+        previousImage();
+      }
+    }
+
+    setTouchStartX(null);
+  };
+
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeLightbox();
+      }
+
+      if (event.key === 'ArrowRight') {
+        nextImage();
+      }
+
+      if (event.key === 'ArrowLeft') {
+        previousImage();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isLightboxOpen, galleryCount]);
+
   return (
-    <article
-      className={`group relative overflow-hidden rounded-3xl bg-[var(--bg-card)] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
-        isPremium
-          ? 'border border-[rgba(23,106,246,0.45)] ring-1 ring-[rgba(23,106,246,0.08)]'
-          : 'border border-[var(--border-subtle)]'
-      }`}
-    >
-      {(center.featured || isPremium) && (
-        <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-1.5">
-          {center.featured && (
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-[var(--accent-blue)] px-3 py-1.5 text-[11px] font-semibold text-white shadow-md">
-              <Star className="w-3.5 h-3.5 fill-current" />
-              Öne Çıkan
-            </div>
-          )}
-
-          {isPremium && (
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-[var(--accent-blue)] px-3 py-1.5 text-[11px] font-semibold text-white shadow-md">
-              <Star className="w-3.5 h-3.5 fill-current" />
-              Premium
-            </div>
-          )}
-        </div>
-      )}
-
-      <div className="p-6">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-[rgba(23,106,246,0.09)] text-[var(--accent-blue)] flex items-center justify-center flex-shrink-0">
-            {isPremium && center.logo ? (
-              <img
-                src={center.logo}
-                alt={`${center.name} logosu`}
-                className="w-full h-full object-contain"
-                loading="lazy"
-              />
-            ) : (
-              <Building2 className="w-6 h-6" />
+    <>
+      <article
+        className={`group relative overflow-hidden rounded-3xl bg-[var(--bg-card)] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
+          isPremium
+            ? 'border border-[rgba(23,106,246,0.45)] ring-1 ring-[rgba(23,106,246,0.08)]'
+            : 'border border-[var(--border-subtle)]'
+        }`}
+      >
+        {(center.featured || isPremium) && (
+          <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-1.5">
+            {center.featured && (
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-[var(--accent-blue)] px-3 py-1.5 text-[11px] font-semibold text-white shadow-md">
+                <Star className="w-3.5 h-3.5 fill-current" />
+                Öne Çıkan
+              </div>
             )}
-          </div>
 
-          <div className="min-w-0 pr-16">
-            <h3 className="text-lg font-semibold text-[var(--text-primary)] leading-snug">
-              {center.name || 'Eğitim Merkezi'}
-            </h3>
-
-            <div className="mt-2 flex items-center gap-1.5 text-sm text-[var(--text-secondary)]">
-              <MapPin className="w-4 h-4 flex-shrink-0" />
-              <span>
-                {center.district
-                  ? `${center.district}, Ankara`
-                  : 'Ankara'}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {isPremium && (
-          <div className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-[rgba(23,106,246,0.08)] px-2.5 py-1.5 text-xs font-semibold text-[var(--accent-blue)]">
-            <Star className="w-3.5 h-3.5 fill-current" />
-            Premium paket
+            {isPremium && (
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-[var(--accent-blue)] px-3 py-1.5 text-[11px] font-semibold text-white shadow-md">
+                <Star className="w-3.5 h-3.5 fill-current" />
+                Premium
+              </div>
+            )}
           </div>
         )}
 
-        {isPremium && center.announcement && (
-          <div className="mt-4 rounded-2xl border border-[rgba(23,106,246,0.14)] bg-[rgba(23,106,246,0.05)] p-4">
-            <div className="flex items-start gap-2.5">
-              <Megaphone className="w-4 h-4 mt-0.5 text-[var(--accent-blue)] flex-shrink-0" />
-              <div>
-                <div className="text-xs font-semibold text-[var(--accent-blue)]">Duyuru</div>
-                <p className="mt-1 text-sm text-[var(--text-secondary)] leading-relaxed">
-                  {center.announcement}
-                </p>
+        <div className="p-6">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-[rgba(23,106,246,0.09)] text-[var(--accent-blue)] flex items-center justify-center flex-shrink-0 overflow-hidden">
+              {isPremium && center.logo ? (
+                <img
+                  src={center.logo}
+                  alt={`${center.name} logosu`}
+                  className="w-full h-full object-contain"
+                  loading="lazy"
+                />
+              ) : (
+                <Building2 className="w-6 h-6" />
+              )}
+            </div>
+
+            <div className="min-w-0 pr-16">
+              <h3 className="text-lg font-semibold text-[var(--text-primary)] leading-snug">
+                {center.name || 'Eğitim Merkezi'}
+              </h3>
+
+              <div className="mt-2 flex items-center gap-1.5 text-sm text-[var(--text-secondary)]">
+                <MapPin className="w-4 h-4 flex-shrink-0" />
+                <span>
+                  {center.district
+                    ? `${center.district}, Ankara`
+                    : 'Ankara'}
+                </span>
               </div>
             </div>
           </div>
-        )}
 
-        {isPremium && center.gallery.length > 0 && (
-          <div className="mt-4 grid grid-cols-3 gap-2">
-            {center.gallery.slice(0, 3).map((imageUrl, index) => (
-              <img
-                key={`${imageUrl}-${index}`}
-                src={imageUrl}
-                alt={`${center.name} fotoğrafı ${index + 1}`}
-                className="w-full h-24 sm:h-28 object-cover rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)]"
-                loading="lazy"
-              />
-            ))}
-          </div>
-        )}
+          {isPremium && (
+            <div className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-[rgba(23,106,246,0.08)] px-2.5 py-1.5 text-xs font-semibold text-[var(--accent-blue)]">
+              <Star className="w-3.5 h-3.5 fill-current" />
+              Premium paket
+            </div>
+          )}
 
-        {center.description && (
-          <p className="mt-4 text-sm text-[var(--text-secondary)] leading-relaxed">
-            {center.description}
-          </p>
-        )}
+          {isPremium && center.announcement && (
+            <div className="mt-4 rounded-2xl border border-[rgba(23,106,246,0.14)] bg-[rgba(23,106,246,0.05)] p-4">
+              <div className="flex items-start gap-2.5">
+                <Megaphone className="w-4 h-4 mt-0.5 text-[var(--accent-blue)] flex-shrink-0" />
 
-        {center.courses.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {center.courses.map((course) => (
-              <span
-                key={course}
-                className="rounded-lg bg-[var(--bg-primary)] border border-[var(--border-subtle)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)]"
+                <div>
+                  <div className="text-xs font-semibold text-[var(--accent-blue)]">
+                    Duyuru
+                  </div>
+
+                  <p className="mt-1 text-sm text-[var(--text-secondary)] leading-relaxed">
+                    {center.announcement}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {hasGallery && (
+            <div className="mt-4">
+              <div
+                className="relative overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] group/gallery"
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
               >
-                {course}
-              </span>
-            ))}
+                <button
+                  type="button"
+                  onClick={openLightbox}
+                  className="relative block w-full h-56 sm:h-64 cursor-zoom-in overflow-hidden"
+                  aria-label="Galeriyi büyüt"
+                >
+                  <img
+                    src={galleryImages[activeImageIndex]}
+                    alt={`${center.name} fotoğrafı ${activeImageIndex + 1}`}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover/gallery:scale-[1.02]"
+                    loading="lazy"
+                  />
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/10 pointer-events-none" />
+
+                  <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md px-2.5 py-1.5 text-[11px] font-semibold text-white">
+                    <Image className="w-3.5 h-3.5" />
+                    {activeImageIndex + 1} / {galleryCount}
+                  </div>
+
+                  <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-3 pointer-events-none">
+                    <span className="rounded-full bg-black/55 backdrop-blur-md px-3 py-1.5 text-[11px] font-medium text-white">
+                      Görselleri büyütmek için dokunun
+                    </span>
+
+                    {galleryCount > 1 && (
+                      <span className="rounded-full bg-black/55 backdrop-blur-md px-3 py-1.5 text-[11px] font-medium text-white">
+                        Kaydır
+                      </span>
+                    )}
+                  </div>
+                </button>
+
+                {galleryCount > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        previousImage();
+                      }}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/55 backdrop-blur-md text-white flex items-center justify-center hover:bg-black/70 transition-all shadow-lg"
+                      aria-label="Önceki görsel"
+                    >
+                      <ArrowLeft className="w-5 h-5" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        nextImage();
+                      }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/55 backdrop-blur-md text-white flex items-center justify-center hover:bg-black/70 transition-all shadow-lg"
+                      aria-label="Sonraki görsel"
+                    >
+                      <ArrowRight className="w-5 h-5" />
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {galleryCount > 1 && (
+                <div className="mt-2.5 flex gap-2 overflow-x-auto pb-1">
+                  {galleryImages.map((imageUrl, index) => (
+                    <button
+                      key={`${imageUrl}-${index}`}
+                      type="button"
+                      onClick={() => setActiveImageIndex(index)}
+                      className={`relative flex-shrink-0 w-16 h-12 sm:w-20 sm:h-14 overflow-hidden rounded-lg border-2 transition-all ${
+                        activeImageIndex === index
+                          ? 'border-[var(--accent-blue)] ring-2 ring-[rgba(23,106,246,0.15)]'
+                          : 'border-[var(--border-subtle)] opacity-70 hover:opacity-100'
+                      }`}
+                      aria-label={`${index + 1}. görseli göster`}
+                    >
+                      <img
+                        src={imageUrl}
+                        alt=""
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+
+                      {activeImageIndex === index && (
+                        <div className="absolute inset-0 bg-[var(--accent-blue)]/10" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {center.description && (
+            <p className="mt-4 text-sm text-[var(--text-secondary)] leading-relaxed">
+              {center.description}
+            </p>
+          )}
+
+          {center.courses.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {center.courses.map((course) => (
+                <span
+                  key={course}
+                  className="rounded-lg bg-[var(--bg-primary)] border border-[var(--border-subtle)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)]"
+                >
+                  {course}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="mt-5 pt-5 border-t border-[var(--border-subtle)] space-y-2">
+            {center.address && (
+              <div className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
+                <MapPin className="w-4 h-4 mt-0.5 text-[var(--accent-blue)] flex-shrink-0" />
+                <span>{center.address}</span>
+              </div>
+            )}
+
+            {center.showPhone && center.phone && (
+              <a
+                href={`tel:${center.phone}`}
+                className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--accent-blue)] transition-colors"
+              >
+                <Phone className="w-4 h-4 text-[var(--accent-blue)]" />
+                <span>{center.phone}</span>
+              </a>
+            )}
+
+            {center.email && (
+              <a
+                href={`mailto:${center.email}`}
+                className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--accent-blue)] transition-colors"
+              >
+                <Mail className="w-4 h-4 text-[var(--accent-blue)]" />
+                <span className="truncate">{center.email}</span>
+              </a>
+            )}
           </div>
-        )}
 
-        <div className="mt-5 pt-5 border-t border-[var(--border-subtle)] space-y-2">
-          {center.address && (
-            <div className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
-              <MapPin className="w-4 h-4 mt-0.5 text-[var(--accent-blue)] flex-shrink-0" />
-              <span>{center.address}</span>
-            </div>
-          )}
-
-          {center.showPhone && center.phone && (
-            <a
-              href={`tel:${center.phone}`}
-              className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--accent-blue)] transition-colors"
-            >
-              <Phone className="w-4 h-4 text-[var(--accent-blue)]" />
-              <span>{center.phone}</span>
-            </a>
-          )}
-
-          {center.email && (
-            <a
-              href={`mailto:${center.email}`}
-              className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--accent-blue)] transition-colors"
-            >
-              <Mail className="w-4 h-4 text-[var(--accent-blue)]" />
-              <span className="truncate">{center.email}</span>
-            </a>
-          )}
-        </div>
-
-        <div className={`mt-6 grid gap-3 ${isPremium && center.whatsapp ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-2'}`}>
-          <a
-            href={mapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-[var(--accent-blue)] text-white text-sm font-semibold hover:brightness-95 transition-all"
+          <div
+            className={`mt-6 grid gap-3 ${
+              isPremium && center.whatsapp
+                ? 'grid-cols-1 sm:grid-cols-3'
+                : 'grid-cols-2'
+            }`}
           >
-            <MapPin className="w-4 h-4" />
-            Yol Tarifi
-          </a>
-
-          {isPremium && center.whatsapp ? (
             <a
-              href={`https://wa.me/${center.whatsapp.replace(/^\+/, '')}`}
+              href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-all"
+              className="inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-[var(--accent-blue)] text-white text-sm font-semibold hover:brightness-95 transition-all"
             >
-              <MessageCircle className="w-4 h-4" />
-              WhatsApp
+              <MapPin className="w-4 h-4" />
+              Yol Tarifi
             </a>
-          ) : null}
 
-          {center.showWebsite && center.website ? (
-            <a
-              href={
-                center.website.startsWith('http')
-                  ? center.website
-                  : `https://${center.website}`
-              }
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 h-11 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-[var(--text-primary)] text-sm font-semibold hover:border-[var(--accent-blue)] hover:text-[var(--accent-blue)] transition-all"
-            >
-              <Globe className="w-4 h-4" />
-              Web Sitesi
-            </a>
-          ) : (
-            <div className="inline-flex items-center justify-center gap-2 h-11 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-[var(--text-secondary)] text-sm font-medium">
-              <ShieldCheck className="w-4 h-4" />
-              Onaylı Merkez
-            </div>
-          )}
+            {isPremium && center.whatsapp ? (
+              <a
+                href={`https://wa.me/${center.whatsapp.replace(/^\+/, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-all"
+              >
+                <MessageCircle className="w-4 h-4" />
+                WhatsApp
+              </a>
+            ) : null}
+
+            {center.showWebsite && center.website ? (
+              <a
+                href={
+                  center.website.startsWith('http')
+                    ? center.website
+                    : `https://${center.website}`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 h-11 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-[var(--text-primary)] text-sm font-semibold hover:border-[var(--accent-blue)] hover:text-[var(--accent-blue)] transition-all"
+              >
+                <Globe className="w-4 h-4" />
+                Web Sitesi
+              </a>
+            ) : (
+              <div className="inline-flex items-center justify-center gap-2 h-11 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-[var(--text-secondary)] text-sm font-medium">
+                <ShieldCheck className="w-4 h-4" />
+                Onaylı Merkez
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </article>
+      </article>
+
+      {isLightboxOpen && hasGallery && (
+        <div
+          className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${center.name} fotoğraf galerisi`}
+          onClick={closeLightbox}
+        >
+          <div
+            className="relative w-full max-w-6xl h-full max-h-[92vh] flex flex-col items-center justify-center gap-4"
+            onClick={(event) => event.stopPropagation()}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            <button
+              type="button"
+              onClick={closeLightbox}
+              className="absolute top-1 right-1 sm:top-2 sm:right-2 z-30 w-11 h-11 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center hover:bg-black/80 transition-all"
+              aria-label="Galeriyi kapat"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            <div className="absolute top-2 left-2 z-30 rounded-full bg-black/60 backdrop-blur-md px-3 py-1.5 text-xs font-semibold text-white">
+              {activeImageIndex + 1} / {galleryCount}
+            </div>
+
+            <div className="relative w-full flex-1 min-h-0 flex items-center justify-center">
+              <img
+                src={galleryImages[activeImageIndex]}
+                alt={`${center.name} fotoğrafı ${activeImageIndex + 1}`}
+                className="max-w-full max-h-[78vh] object-contain rounded-2xl select-none"
+              />
+
+              {galleryCount > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={previousImage}
+                    className="absolute left-1 sm:left-4 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center hover:bg-black/80 transition-all"
+                    aria-label="Önceki görsel"
+                  >
+                    <ArrowLeft className="w-6 h-6" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={nextImage}
+                    className="absolute right-1 sm:right-4 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center hover:bg-black/80 transition-all"
+                    aria-label="Sonraki görsel"
+                  >
+                    <ArrowRight className="w-6 h-6" />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {galleryCount > 1 && (
+              <div className="w-full overflow-x-auto pb-1">
+                <div className="flex justify-center gap-2 min-w-max mx-auto px-2">
+                  {galleryImages.map((imageUrl, index) => (
+                    <button
+                      key={`${imageUrl}-${index}`}
+                      type="button"
+                      onClick={() => setActiveImageIndex(index)}
+                      className={`relative flex-shrink-0 w-16 h-12 sm:w-20 sm:h-14 overflow-hidden rounded-lg border-2 transition-all ${
+                        activeImageIndex === index
+                          ? 'border-white ring-2 ring-white/20'
+                          : 'border-white/20 opacity-60 hover:opacity-100'
+                      }`}
+                      aria-label={`${index + 1}. görseli aç`}
+                    >
+                      <img
+                        src={imageUrl}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="text-center text-xs text-white/70">
+              {center.name}
+              {galleryCount > 1
+                ? ' • Kaydırarak veya okları kullanarak gezinebilirsiniz'
+                : ''}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -2330,6 +2611,7 @@ export default function FirstAidCourses() {
     </div>
   );
 }
+
 
 
 
