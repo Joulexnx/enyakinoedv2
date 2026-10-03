@@ -106,7 +106,7 @@ function LegalModal({
             number
           ],
         }}
-        className="bg-white dark:bg-[#161823] rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden"
+        className="bg-[var(--bg-card)] rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-subtle)] flex-shrink-0">
@@ -146,7 +146,7 @@ export function Footer() {
 
   return (
     <>
-      <footer className="py-6 bg-white dark:bg-[var(--bg-card)] border-t border-[var(--border-subtle)]">
+      <footer className="py-6 bg-[var(--bg-card)] border-t border-[var(--border-subtle)]">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
 
           <p className="text-xs text-[var(--text-muted)] text-center sm:text-left">

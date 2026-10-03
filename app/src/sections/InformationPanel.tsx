@@ -10,8 +10,8 @@ import {
 
 const infoCards = [
   {
-    icon: <HeartPulse className="w-7 h-7 text-[#DC2626]" />,
-    iconBg: 'bg-[#FEE2E2] dark:bg-[rgba(239,68,68,0.15)]',
+    icon: <HeartPulse className="w-7 h-7 text-[var(--accent-red)]" />,
+    iconBg: 'bg-[var(--accent-red-light)]',
     image: './oed-device.jpg',
     title: 'OED Nedir?',
     shortText:
@@ -25,8 +25,8 @@ const infoCards = [
     ],
   },
   {
-    icon: <BookOpen className="w-7 h-7 text-[#2563EB]" />,
-    iconBg: 'bg-[#DBEAFE] dark:bg-[rgba(59,130,246,0.15)]',
+    icon: <BookOpen className="w-7 h-7 text-[var(--accent-blue)]" />,
+    iconBg: 'bg-[var(--accent-blue-light)]',
     image: './tyd-training.jpg',
     title: 'Nasıl Kullanılır?',
     shortText:
@@ -41,8 +41,8 @@ const infoCards = [
     ],
   },
   {
-    icon: <Phone className="w-7 h-7 text-[#059669]" />,
-    iconBg: 'bg-[#D1FAE5] dark:bg-[rgba(16,185,129,0.15)]',
+    icon: <Phone className="w-7 h-7 text-[var(--accent-green)]" />,
+    iconBg: 'bg-[var(--accent-green-light)]',
     image: null,
     title: "Önce 112'yi Arayın",
     shortText:
@@ -84,7 +84,7 @@ function InfoCard({
           number
         ],
       }}
-      className="bg-white dark:bg-[var(--bg-card)] rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-250"
+      className="bg-[var(--bg-card)] rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-250"
     >
       {card.image && (
         <div className="w-full h-44 overflow-hidden">

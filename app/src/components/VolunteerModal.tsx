@@ -238,7 +238,7 @@ export function VolunteerModal({
                 number
               ],
             }}
-            className="bg-white dark:bg-[#161823] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+            className="bg-[var(--bg-card)] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
             onClick={(e) =>
               e.stopPropagation()
             }
@@ -294,7 +294,7 @@ export function VolunteerModal({
                       }
                       placeholder="Adınız ve soyadınız"
                       required
-                      className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] dark:bg-[#0D0F18] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-blue)] transition-all"
+                      className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-blue)] transition-all"
                     />
                   </div>
 
@@ -314,7 +314,7 @@ export function VolunteerModal({
                       }
                       placeholder="05XX XXX XX XX"
                       required
-                      className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] dark:bg-[#0D0F18] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-blue)] transition-all"
+                      className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-blue)] transition-all"
                     />
                   </div>
 

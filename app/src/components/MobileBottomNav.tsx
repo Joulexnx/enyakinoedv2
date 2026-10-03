@@ -178,8 +178,8 @@ export function MobileBottomNav({
             overflow-hidden
             rounded-2xl
             border
-            border-white/[0.08]
-            bg-[#0c1222]/[0.97]
+            border-[var(--border-subtle)]
+            bg-[var(--bg-card)]/[0.97]
             shadow-[0_-8px_35px_rgba(0,0,0,0.35)]
             backdrop-blur-xl
           "
@@ -196,7 +196,7 @@ export function MobileBottomNav({
               h-px
               bg-gradient-to-r
               from-transparent
-              via-white/15
+              via-[var(--text-primary)]/15
               to-transparent
             "
           />
@@ -247,7 +247,7 @@ export function MobileBottomNav({
                         w-12
                         h-8
                         rounded-xl
-                        bg-blue-500/10
+                        bg-[var(--accent-blue-light)]
                       "
                     />
                   )}
@@ -261,7 +261,7 @@ export function MobileBottomNav({
                         w-7
                         h-0.5
                         rounded-full
-                        bg-blue-500
+                        bg-[var(--accent-blue)]
                         shadow-[0_0_10px_rgba(59,130,246,0.7)]
                       "
                     />
@@ -281,8 +281,8 @@ export function MobileBottomNav({
                       duration-200
                       ${
                         isActive
-                          ? 'text-blue-400'
-                          : 'text-white/40'
+                          ? 'text-[var(--accent-blue)]'
+                          : 'text-[var(--text-muted)]'
                       }
                     `}
                   >
@@ -308,8 +308,8 @@ export function MobileBottomNav({
                       duration-200
                       ${
                         isActive
-                          ? 'text-blue-400'
-                          : 'text-white/40'
+                          ? 'text-[var(--accent-blue)]'
+                          : 'text-[var(--text-muted)]'
                       }
                     `}
                   >
@@ -326,7 +326,7 @@ export function MobileBottomNav({
           <div
             className="
               h-[env(safe-area-inset-bottom)]
-              bg-[#0c1222]
+              bg-[var(--bg-card)]
             "
           />
 

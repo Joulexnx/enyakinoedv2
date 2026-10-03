@@ -101,19 +101,19 @@ export function HeroSection({
 
               {/* ACİL YARDIM */}
               <div
-                className="flex items-center gap-2.5 px-4 py-3 rounded-xl border border-white/10 bg-white/[0.04] text-white/60 cursor-not-allowed min-w-[165px]"
+                className="flex items-center gap-2.5 px-4 py-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-card)] text-[var(--text-secondary)] cursor-not-allowed min-w-[165px]"
                 aria-disabled="true"
               >
-                <div className="w-9 h-9 rounded-lg bg-red-500/10 flex items-center justify-center flex-shrink-0">
-                  <Siren className="w-4 h-4 text-red-400" />
+                <div className="w-9 h-9 rounded-lg bg-[var(--accent-red-light)] flex items-center justify-center flex-shrink-0">
+                  <Siren className="w-4 h-4 text-[var(--accent-red)]" />
                 </div>
 
                 <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-white/75">
+                  <span className="text-xs font-semibold text-[var(--text-primary)]">
                     Acil Yardım
                   </span>
 
-                  <span className="flex items-center gap-1 text-[10px] text-white/40 mt-0.5">
+                  <span className="flex items-center gap-1 text-[10px] text-[var(--text-muted)] mt-0.5">
                     <LockKeyhole className="w-3 h-3" />
                     Yakında Aktif
                   </span>
@@ -122,19 +122,19 @@ export function HeroSection({
 
               {/* GÖNÜLLÜ */}
               <div
-                className="flex items-center gap-2.5 px-4 py-3 rounded-xl border border-white/10 bg-white/[0.04] text-white/60 cursor-not-allowed min-w-[165px]"
+                className="flex items-center gap-2.5 px-4 py-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-card)] text-[var(--text-secondary)] cursor-not-allowed min-w-[165px]"
                 aria-disabled="true"
               >
-                <div className="w-9 h-9 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
-                  <HeartHandshake className="w-4 h-4 text-green-400" />
+                <div className="w-9 h-9 rounded-lg bg-[var(--accent-green-light)] flex items-center justify-center flex-shrink-0">
+                  <HeartHandshake className="w-4 h-4 text-[var(--accent-green)]" />
                 </div>
 
                 <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-white/75">
+                  <span className="text-xs font-semibold text-[var(--text-primary)]">
                     Gönüllü Ol
                   </span>
 
-                  <span className="flex items-center gap-1 text-[10px] text-white/40 mt-0.5">
+                  <span className="flex items-center gap-1 text-[10px] text-[var(--text-muted)] mt-0.5">
                     <LockKeyhole className="w-3 h-3" />
                     Yakında Aktif
                   </span>

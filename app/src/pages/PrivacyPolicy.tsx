@@ -1,23 +1,25 @@
 export default function PrivacyPolicy() {
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] text-white">
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]">
       <div className="mx-auto max-w-4xl px-6 py-12">
         <a
           href="/"
-          className="mb-8 inline-block text-sm text-blue-400 hover:text-blue-300"
+          className="mb-8 inline-block text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
         >
           ← En Yakın OED'ye Dön
         </a>
 
-        <h1 className="mb-3 text-4xl font-bold">Gizlilik Politikası</h1>
+        <h1 className="mb-3 text-4xl font-bold text-[var(--text-primary)]">
+          Gizlilik Politikası
+        </h1>
 
-        <p className="mb-10 text-sm text-gray-400">
+        <p className="mb-10 text-sm text-[var(--text-muted)]">
           Son güncelleme: 1 Ekim 2026
         </p>
 
-        <div className="space-y-8 leading-7 text-gray-300">
+        <div className="space-y-8 leading-7 text-[var(--text-secondary)]">
           <section>
-            <h2 className="mb-3 text-xl font-semibold text-white">
+            <h2 className="mb-3 text-xl font-semibold text-[var(--text-primary)]">
               1. Genel
             </h2>
             <p>
@@ -28,7 +30,7 @@ export default function PrivacyPolicy() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-xl font-semibold text-white">
+            <h2 className="mb-3 text-xl font-semibold text-[var(--text-primary)]">
               2. Toplanan ve İşlenen Bilgiler
             </h2>
             <p>
@@ -44,7 +46,7 @@ export default function PrivacyPolicy() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-xl font-semibold text-white">
+            <h2 className="mb-3 text-xl font-semibold text-[var(--text-primary)]">
               3. Konum Verileri
             </h2>
             <p>
@@ -56,7 +58,7 @@ export default function PrivacyPolicy() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-xl font-semibold text-white">
+            <h2 className="mb-3 text-xl font-semibold text-[var(--text-primary)]">
               4. Çerezler ve Yerel Depolama
             </h2>
             <p>
@@ -67,7 +69,7 @@ export default function PrivacyPolicy() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-xl font-semibold text-white">
+            <h2 className="mb-3 text-xl font-semibold text-[var(--text-primary)]">
               5. Verilerin Paylaşılması
             </h2>
             <p>
@@ -77,7 +79,7 @@ export default function PrivacyPolicy() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-xl font-semibold text-white">
+            <h2 className="mb-3 text-xl font-semibold text-[var(--text-primary)]">
               6. Veri Saklama ve Silme
             </h2>
             <p>
@@ -92,7 +94,7 @@ export default function PrivacyPolicy() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-xl font-semibold text-white">
+            <h2 className="mb-3 text-xl font-semibold text-[var(--text-primary)]">
               7. Güvenlik
             </h2>
             <p>
@@ -102,7 +104,7 @@ export default function PrivacyPolicy() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-xl font-semibold text-white">
+            <h2 className="mb-3 text-xl font-semibold text-[var(--text-primary)]">
               8. Çocukların Gizliliği
             </h2>
             <p>
@@ -113,7 +115,7 @@ export default function PrivacyPolicy() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-xl font-semibold text-white">
+            <h2 className="mb-3 text-xl font-semibold text-[var(--text-primary)]">
               9. Politika Değişiklikleri
             </h2>
             <p>
@@ -124,7 +126,7 @@ export default function PrivacyPolicy() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-xl font-semibold text-white">
+            <h2 className="mb-3 text-xl font-semibold text-[var(--text-primary)]">
               10. İletişim
             </h2>
             <p>
@@ -136,7 +138,7 @@ export default function PrivacyPolicy() {
             <p className="mt-3">
               <a
                 href="mailto:alperoyanik@gmail.com"
-                className="text-blue-400 hover:text-blue-300"
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
               >
                 alperoyanik@gmail.com
               </a>
@@ -144,7 +146,7 @@ export default function PrivacyPolicy() {
           </section>
         </div>
 
-        <div className="mt-12 border-t border-white/10 pt-6 text-sm text-gray-500">
+        <div className="mt-12 border-t border-[var(--border-subtle)] pt-6 text-sm text-[var(--text-muted)]">
           © 2026 En Yakın OED — Hayat kurtarmak için geliştirildi
         </div>
       </div>

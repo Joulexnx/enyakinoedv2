@@ -15,7 +15,7 @@ export function NearbyOEDList({
   return (
     <section
       id="nearby-oed"
-      className="py-12 sm:py-16 bg-white dark:bg-[var(--bg-card)] scroll-mt-24"
+      className="py-12 sm:py-16 bg-[var(--bg-card)] scroll-mt-24"
     >
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
 

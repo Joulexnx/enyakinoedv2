@@ -9,7 +9,12 @@ interface OEDCardProps {
 
 export function OEDLocationCard({ oed, index }: OEDCardProps) {
   const isAvailable = oed.status === 'available';
-  const statusColor = isAvailable ? 'bg-[#059669]' : oed.status === 'in-use' ? 'bg-[#D97706]' : 'bg-[var(--text-muted)]';
+  const statusColor = isAvailable
+    ? 'bg-[var(--accent-green)]'
+    : oed.status === 'in-use'
+      ? 'bg-[var(--accent-amber)]'
+      : 'bg-[var(--text-muted)]';
+
   const statusText = isAvailable ? 'Müsait' : oed.status === 'in-use' ? 'Kullanımda' : 'Bilinmiyor';
 
   const formatDistance = (d?: number) => {
@@ -28,7 +33,7 @@ export function OEDLocationCard({ oed, index }: OEDCardProps) {
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
-      className="bg-white dark:bg-[var(--bg-card)] rounded-xl p-4 shadow-sm hover:shadow-md border-l-[3px] border-l-transparent hover:border-l-[var(--accent-blue)] transition-all duration-200"
+      className="bg-[var(--bg-card)] rounded-xl p-4 shadow-sm hover:shadow-md border-l-[3px] border-l-transparent hover:border-l-[var(--accent-blue)] transition-all duration-200"
     >
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-3">

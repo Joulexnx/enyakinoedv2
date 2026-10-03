@@ -66,11 +66,11 @@ export function TYDGuide() {
   const [openStep, setOpenStep] = useState<number | null>(null);
 
   return (
-    <section className="py-12 sm:py-16 bg-white dark:bg-[var(--bg-card)] px-4 sm:px-6 border-y border-[var(--border-subtle)]">
+    <section className="py-12 sm:py-16 bg-[var(--bg-card)] px-4 sm:px-6 border-y border-[var(--border-subtle)]">
       <div className="max-w-[1200px] mx-auto">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full flex items-center justify-between p-5 rounded-2xl bg-[var(--bg-primary)] dark:bg-[#0D0F18] shadow-md hover:shadow-lg transition-all"
+          className="w-full flex items-center justify-between p-5 rounded-2xl bg-[var(--bg-primary)] shadow-md hover:shadow-lg transition-all"
         >
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-[var(--accent-red-light)] flex items-center justify-center">
@@ -106,7 +106,7 @@ export function TYDGuide() {
                   <div key={item.step} className="rounded-xl border border-[var(--border)] overflow-hidden">
                     <button
                       onClick={() => setOpenStep(openStep === item.step ? null : item.step)}
-                      className="w-full flex items-center gap-4 p-4 hover:bg-[var(--bg-primary)] dark:hover:bg-[#0D0F18] transition-colors"
+                      className="w-full flex items-center gap-4 p-4 hover:bg-[var(--bg-primary)] transition-colors"
                     >
                       <span className={`w-8 h-8 rounded-full ${item.color} flex items-center justify-center text-sm font-bold flex-shrink-0`}>
                         {item.step}

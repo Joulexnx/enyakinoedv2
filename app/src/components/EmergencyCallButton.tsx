@@ -322,7 +322,7 @@ export function EmergencyCallButton({
           damping: 12,
         }}
         disabled
-        className="fixed bottom-24 sm:bottom-8 left-4 sm:left-auto sm:right-24 z-50 flex items-center gap-2.5 px-5 py-3.5 rounded-full bg-gray-400 text-white font-bold shadow-md cursor-not-allowed opacity-90"
+        className="fixed bottom-24 sm:bottom-8 left-4 sm:left-auto sm:right-24 z-50 flex items-center gap-2.5 px-5 py-3.5 rounded-full bg-[var(--text-muted)] text-white font-bold shadow-md cursor-not-allowed opacity-90"
       >
         <span className="text-sm">
           🔒 Yakında Aktif
@@ -371,7 +371,7 @@ export function EmergencyCallButton({
                   number
                 ],
               }}
-              className="bg-white dark:bg-[#161823] rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden max-h-[90vh] flex flex-col"
+              className="bg-[var(--bg-card)] rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden max-h-[90vh] flex flex-col"
               onClick={(e) =>
                 e.stopPropagation()
               }
@@ -419,7 +419,7 @@ export function EmergencyCallButton({
                       </div>
                     </div>
 
-                    <div className="p-4 rounded-xl bg-[var(--bg-primary)] dark:bg-[#0D0F18]">
+                    <div className="p-4 rounded-xl bg-[var(--bg-primary)]">
                       <p className="text-sm font-medium text-[var(--text-primary)] mb-2">
                         <MapPin className="w-4 h-4 inline mr-1" />
                         1000m içindeki aktif gönüllüler:
@@ -442,7 +442,7 @@ export function EmergencyCallButton({
                       )}
                     </div>
 
-                    <div className="p-2 rounded-lg bg-[var(--bg-primary)] dark:bg-[#0D0F18] text-xs">
+                    <div className="p-2 rounded-lg bg-[var(--bg-primary)] text-xs">
                       <p className="text-[var(--text-muted)]">
                         Service Worker:{' '}
                         {swStatus ||
@@ -544,7 +544,7 @@ export function EmergencyCallButton({
                               key={
                                 volunteer.id
                               }
-                              className="flex items-center gap-3 p-3 rounded-xl bg-[var(--bg-primary)] dark:bg-[#0D0F18]"
+                              className="flex items-center gap-3 p-3 rounded-xl bg-[var(--bg-primary)]"
                             >
                               <div className="w-8 h-8 rounded-full bg-[var(--accent-green-light)] flex items-center justify-center flex-shrink-0">
                                 <span className="text-xs font-bold text-[var(--accent-green)]">
@@ -585,7 +585,7 @@ export function EmergencyCallButton({
 
                     <button
                       onClick={reset}
-                      className="w-full py-3 rounded-xl bg-[var(--bg-primary)] dark:bg-[#0D0F18] text-[var(--text-primary)] font-medium border border-[var(--border)] hover:bg-[var(--border-subtle)] transition-all"
+                      className="w-full py-3 rounded-xl bg-[var(--bg-primary)] text-[var(--text-primary)] font-medium border border-[var(--border)] hover:bg-[var(--border-subtle)] transition-all"
                     >
                       Kapat
                     </button>

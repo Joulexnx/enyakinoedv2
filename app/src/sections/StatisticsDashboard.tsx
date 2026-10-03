@@ -8,11 +8,11 @@ interface StatisticsDashboardProps {
 
 export function StatisticsDashboard({ nearestDistance, walkingTime }: StatisticsDashboardProps) {
   return (
-    <section className="py-8 bg-white dark:bg-[var(--bg-card)] border-y border-[var(--border-subtle)]">
+    <section className="py-8 bg-[var(--bg-card)] border-y border-[var(--border-subtle)]">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
-            icon={<Heart className="w-5 h-5 text-[#DC2626]" />}
+            icon={<Heart className="w-5 h-5 text-[var(--accent-red)]" />}
             label="Toplam OED"
             value={25}
             subtitle="Ankara'da kayıtlı cihaz"
@@ -21,7 +21,7 @@ export function StatisticsDashboard({ nearestDistance, walkingTime }: Statistics
             delay={0}
           />
           <StatCard
-            icon={<MapPin className="w-5 h-5 text-[#2563EB]" />}
+            icon={<MapPin className="w-5 h-5 text-[var(--accent-blue)]" />}
             label="En Yakın"
             value={nearestDistance}
             subtitle="Mesafe"
@@ -29,7 +29,7 @@ export function StatisticsDashboard({ nearestDistance, walkingTime }: Statistics
             delay={1}
           />
           <StatCard
-            icon={<Footprints className="w-5 h-5 text-[#D97706]" />}
+            icon={<Footprints className="w-5 h-5 text-[var(--accent-amber)]" />}
             label="Tahmini Süre"
             value={walkingTime}
             subtitle="Yürüyüş mesafesi"
@@ -37,7 +37,7 @@ export function StatisticsDashboard({ nearestDistance, walkingTime }: Statistics
             delay={2}
           />
           <StatCard
-            icon={<Activity className="w-5 h-5 text-[#059669]" />}
+            icon={<Activity className="w-5 h-5 text-[var(--accent-green)]" />}
             label="Sistem Durumu"
             value="Aktif"
             subtitle="Tüm sistemler çalışıyor"

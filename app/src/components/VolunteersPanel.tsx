@@ -216,7 +216,7 @@ export function VolunteersPanel({
         onClick={() =>
           setExpanded(!expanded)
         }
-        className="w-full flex items-center justify-between p-4 rounded-xl bg-white dark:bg-[var(--bg-card)] shadow-md hover:shadow-lg transition-all"
+        className="w-full flex items-center justify-between p-4 rounded-xl bg-[var(--bg-card)] shadow-md hover:shadow-lg transition-all"
       >
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-[var(--accent-green-light)] flex items-center justify-center">
@@ -256,7 +256,7 @@ export function VolunteersPanel({
             opacity: 1,
           }}
           transition={{ duration: 0.3 }}
-          className="mt-3 bg-white dark:bg-[var(--bg-card)] rounded-xl shadow-md overflow-hidden"
+          className="mt-3 bg-[var(--bg-card)] rounded-xl shadow-md overflow-hidden"
         >
           {isError ? (
             <div className="p-8 text-center">
@@ -285,7 +285,7 @@ export function VolunteersPanel({
                 (volunteer) => (
                   <div
                     key={volunteer.id}
-                    className="flex items-center gap-3 p-4 hover:bg-[var(--bg-primary)] dark:hover:bg-[#0D0F18] transition-colors"
+                    className="flex items-center gap-3 p-4 hover:bg-[var(--bg-primary)] transition-colors"
                   >
                     <div className="w-8 h-8 rounded-full bg-[var(--accent-green-light)] flex items-center justify-center flex-shrink-0">
                       <span className="text-xs font-bold text-[var(--accent-green)]">
