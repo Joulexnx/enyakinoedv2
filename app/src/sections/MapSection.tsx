@@ -504,7 +504,7 @@ export function MapSection({
   return (
     <section
       id="oed-map"
-      className="pt-10 pb-12 sm:pb-16 px-4 sm:px-6 scroll-mt-24"
+      className="pt-10 pb-[120px] sm:pb-16 px-4 sm:px-6 scroll-mt-24"
     >
       <div className="max-w-[1200px] mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5">
@@ -846,6 +846,7 @@ export function MapSection({
     </section>
   );
 }
+
 
 
 
