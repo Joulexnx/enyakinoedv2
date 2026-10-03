@@ -61,21 +61,61 @@ const userIcon = L.divIcon({
   iconAnchor: [8, 8],
 });
 
+const emergencyIcon = L.divIcon({
+  className: 'custom-emergency-marker',
+  html: `<div style="
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #EF4444;
+    border: 4px solid white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+  ">!</div>`,
+  iconSize: [48, 48],
+  iconAnchor: [24, 24],
+  popupAnchor: [0, -28],
+});
+
 function MapController({
   userLocation,
+  emergencyLocation,
 }: {
   userLocation: UserLocation | null;
+  emergencyLocation: [number, number] | null;
 }) {
   const map = useMap();
 
   useEffect(() => {
-    if (userLocation) {
-      map.flyTo([userLocation.lat, userLocation.lng], 15, {
-        duration: 1.2,
-        easeLinearity: 0.25,
-      });
+    if (emergencyLocation) {
+      map.flyTo(
+        emergencyLocation,
+        17,
+        {
+          duration: 1.5,
+          easeLinearity: 0.25,
+        }
+      );
+
+      return;
     }
-  }, [userLocation, map]);
+
+    if (userLocation) {
+      map.flyTo(
+        [userLocation.lat, userLocation.lng],
+        15,
+        {
+          duration: 1.2,
+          easeLinearity: 0.25,
+        }
+      );
+    }
+  }, [userLocation, emergencyLocation, map]);
 
   return null;
 }
@@ -86,23 +126,104 @@ export function MapSection({
   oedLocations,
   onRequestLocation,
 }: MapSectionProps) {
-  const [mapRef, isInView] = useInView<HTMLDivElement>();
-  const [isMapReady, setIsMapReady] = useState(false);
+  const [mapRef, isInView] =
+    useInView<HTMLDivElement>();
 
-  const mapCenter = useMemo(() => {
-    if (userLocation) {
-      return [userLocation.lat, userLocation.lng] as [number, number];
+  const [isMapReady, setIsMapReady] =
+    useState(false);
+
+  /*
+   * OneSignal bildirimi uygulamayı açtığında
+   * URL şu şekilde gelir:
+   *
+   * /?lat=39.9195&lng=32.8704
+   *
+   * Buradan acil durum koordinatlarını alıyoruz.
+   */
+  const emergencyLocation = useMemo(() => {
+    const params = new URLSearchParams(
+      window.location.search
+    );
+
+    const lat = Number(
+      params.get('lat')
+    );
+
+    const lng = Number(
+      params.get('lng')
+    );
+
+    if (
+      Number.isFinite(lat) &&
+      Number.isFinite(lng) &&
+      lat >= -90 &&
+      lat <= 90 &&
+      lng >= -180 &&
+      lng <= 180
+    ) {
+      return [lat, lng] as [
+        number,
+        number
+      ];
     }
 
-    return [39.925533, 32.866287] as [number, number];
-  }, [userLocation]);
+    return null;
+  }, []);
+
+  /*
+   * Acil bildirimle açıldıysa
+   * kullanıcıyı doğrudan harita bölümüne götür.
+   */
+  useEffect(() => {
+    if (!emergencyLocation) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      mapRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }, 700);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [emergencyLocation, mapRef]);
+
+  /*
+   * Haritanın ilk açılacağı merkez.
+   * Acil durum koordinatı varsa öncelik onda.
+   */
+  const mapCenter = useMemo(() => {
+    if (emergencyLocation) {
+      return emergencyLocation;
+    }
+
+    if (userLocation) {
+      return [
+        userLocation.lat,
+        userLocation.lng,
+      ] as [number, number];
+    }
+
+    return [
+      39.925533,
+      32.866287,
+    ] as [number, number];
+  }, [
+    userLocation,
+    emergencyLocation,
+  ]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsMapReady(true);
     }, 300);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+    };
   }, []);
 
   return (
@@ -125,6 +246,7 @@ export function MapSection({
 
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-[#DC2626]"></span>
+
             <span className="text-xs text-[var(--text-muted)]">
               OED Cihazı
             </span>
@@ -132,31 +254,70 @@ export function MapSection({
 
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-[#2563EB]"></span>
+
             <span className="text-xs text-[var(--text-muted)]">
               Sizin Konumunuz
             </span>
           </div>
 
+          {emergencyLocation && (
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-[#EF4444]"></span>
+
+              <span className="text-xs text-[var(--text-muted)]">
+                Acil Durum Konumu
+              </span>
+            </div>
+          )}
+
         </div>
 
         <motion.div
           ref={mapRef}
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          animate={
+            isInView
+              ? {
+                  opacity: 1,
+                  y: 0,
+                }
+              : {}
+          }
           transition={{
             duration: 0.6,
-            ease: [0.22, 1, 0.36, 1],
+            ease: [
+              0.22,
+              1,
+              0.36,
+              1,
+            ],
           }}
           className="relative rounded-2xl shadow-xl border border-[var(--border)] overflow-hidden bg-white"
-          style={{ aspectRatio: '16/9' }}
+          style={{
+            aspectRatio: '16/9',
+          }}
         >
 
-          {!isMapReady || geolocationStatus === 'loading' ? (
+          {/*
+           * Acil durum koordinatı varsa,
+           * konum izni olmasa bile haritayı göster.
+           */}
+          {!isMapReady ||
+          (
+            geolocationStatus === 'loading' &&
+            !emergencyLocation
+          ) ? (
 
             <SkeletonLoader />
 
-          ) : geolocationStatus === 'denied' ||
-            geolocationStatus === 'error' ? (
+          ) : (
+            geolocationStatus === 'denied' ||
+            geolocationStatus === 'error'
+          ) &&
+          !emergencyLocation ? (
 
             <div className="w-full h-full flex flex-col items-center justify-center bg-[var(--bg-primary)] min-h-[300px]">
 
@@ -170,7 +331,12 @@ export function MapSection({
                 className="opacity-30"
               >
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                <circle cx="12" cy="10" r="3" />
+
+                <circle
+                  cx="12"
+                  cy="10"
+                  r="3"
+                />
               </svg>
 
               <p className="mt-3 text-sm text-[var(--text-muted)]">
@@ -178,7 +344,9 @@ export function MapSection({
               </p>
 
               <button
-                onClick={onRequestLocation}
+                onClick={
+                  onRequestLocation
+                }
                 className="mt-3 px-5 py-2 rounded-lg bg-[var(--accent-blue)] text-white text-sm font-medium hover:bg-[var(--accent-blue-hover)] transition-colors"
               >
                 Konumumu Kullan
@@ -190,11 +358,17 @@ export function MapSection({
 
             <MapContainer
               center={mapCenter}
-              zoom={13}
+              zoom={
+                emergencyLocation
+                  ? 17
+                  : 13
+              }
               scrollWheelZoom={true}
               zoomControl={false}
               className="w-full h-full"
-              style={{ minHeight: '300px' }}
+              style={{
+                minHeight: '300px',
+              }}
             >
 
               <TileLayer
@@ -203,8 +377,42 @@ export function MapSection({
                 maxZoom={20}
               />
 
-              <MapController userLocation={userLocation} />
+              <MapController
+                userLocation={
+                  userLocation
+                }
+                emergencyLocation={
+                  emergencyLocation
+                }
+              />
 
+              {/*
+               * ACİL DURUM KONUMU
+               */}
+              {emergencyLocation && (
+                <Marker
+                  position={
+                    emergencyLocation
+                  }
+                  icon={emergencyIcon}
+                >
+                  <Popup>
+                    <div className="min-w-[180px]">
+                      <h3 className="text-sm font-semibold text-red-600">
+                        🚨 Acil Durum
+                      </h3>
+
+                      <p className="text-xs text-[var(--text-muted)] mt-1">
+                        Yardım gerekiyor.
+                      </p>
+                    </div>
+                  </Popup>
+                </Marker>
+              )}
+
+              {/*
+               * KULLANICININ KONUMU
+               */}
               {userLocation && (
                 <>
                   <Circle
@@ -212,7 +420,10 @@ export function MapSection({
                       userLocation.lat,
                       userLocation.lng,
                     ]}
-                    radius={userLocation.accuracy || 100}
+                    radius={
+                      userLocation.accuracy ||
+                      100
+                    }
                     pathOptions={{
                       color: '#2563EB',
                       fillColor: '#2563EB',
@@ -232,81 +443,102 @@ export function MapSection({
                 </>
               )}
 
-              {oedLocations.map((oed, index) => (
-                <Marker
-                  key={oed.id}
-                  position={[oed.lat, oed.lng]}
-                  icon={
-                    index === 0 && oed.distance
-                      ? nearestOedIcon
-                      : oedIcon
-                  }
-                >
+              {/*
+               * OED CİHAZLARI
+               */}
+              {oedLocations.map(
+                (oed, index) => (
+                  <Marker
+                    key={oed.id}
+                    position={[
+                      oed.lat,
+                      oed.lng,
+                    ]}
+                    icon={
+                      index === 0 &&
+                      oed.distance
+                        ? nearestOedIcon
+                        : oedIcon
+                    }
+                  >
 
-                  <Popup>
+                    <Popup>
 
-                    <div className="min-w-[200px]">
+                      <div className="min-w-[200px]">
 
-                      <h3 className="text-sm font-semibold text-[var(--text-primary)]">
-                        {oed.name}
-                      </h3>
+                        <h3 className="text-sm font-semibold text-[var(--text-primary)]">
+                          {oed.name}
+                        </h3>
 
-                      <p className="text-xs text-[var(--text-muted)] mt-1">
-                        {oed.address}
-                      </p>
+                        <p className="text-xs text-[var(--text-muted)] mt-1">
+                          {oed.address}
+                        </p>
 
-                      <div className="flex items-center gap-2 mt-2">
+                        <div className="flex items-center gap-2 mt-2">
 
-                        <span
-                          className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                            oed.status === 'available'
-                              ? 'bg-[var(--accent-green-light)] text-[var(--accent-green)]'
-                              : oed.status === 'in-use'
-                              ? 'bg-[var(--accent-amber-light)] text-[var(--accent-amber)]'
-                              : 'bg-gray-100 text-gray-500'
-                          }`}
-                        >
-                          {oed.status === 'available'
-                            ? 'Müsait'
-                            : oed.status === 'in-use'
-                            ? 'Kullanımda'
-                            : 'Bilinmiyor'}
-                        </span>
-
-                        {oed.distance !== undefined && (
-                          <span className="text-[10px] font-medium text-[var(--accent-blue)]">
-                            {oed.distance < 1000
-                              ? `${oed.distance}m`
-                              : `${(oed.distance / 1000).toFixed(1)}km`}
+                          <span
+                            className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                              oed.status ===
+                              'available'
+                                ? 'bg-[var(--accent-green-light)] text-[var(--accent-green)]'
+                                : oed.status ===
+                                  'in-use'
+                                ? 'bg-[var(--accent-amber-light)] text-[var(--accent-amber)]'
+                                : 'bg-gray-100 text-gray-500'
+                            }`}
+                          >
+                            {oed.status ===
+                            'available'
+                              ? 'Müsait'
+                              : oed.status ===
+                                'in-use'
+                              ? 'Kullanımda'
+                              : 'Bilinmiyor'}
                           </span>
-                        )}
+
+                          {oed.distance !==
+                            undefined && (
+                            <span className="text-[10px] font-medium text-[var(--accent-blue)]">
+                              {oed.distance <
+                              1000
+                                ? `${oed.distance}m`
+                                : `${(
+                                    oed.distance /
+                                    1000
+                                  ).toFixed(
+                                    1
+                                  )}km`}
+                            </span>
+                          )}
+
+                        </div>
+
+                        <button
+                          onClick={() =>
+                            window.open(
+                              `https://www.google.com/maps/dir/?api=1&destination=${oed.lat},${oed.lng}`,
+                              '_blank'
+                            )
+                          }
+                          className="mt-3 w-full py-2 rounded-lg bg-[var(--accent-blue)] text-white text-xs font-medium hover:bg-[var(--accent-blue-hover)] transition-colors"
+                        >
+                          Yol Tarifi Al
+                        </button>
 
                       </div>
 
-                      <button
-                        onClick={() =>
-                          window.open(
-                            `https://www.google.com/maps/dir/?api=1&destination=${oed.lat},${oed.lng}`,
-                            '_blank'
-                          )
-                        }
-                        className="mt-3 w-full py-2 rounded-lg bg-[var(--accent-blue)] text-white text-xs font-medium hover:bg-[var(--accent-blue-hover)] transition-colors"
-                      >
-                        Yol Tarifi Al
-                      </button>
+                    </Popup>
 
-                    </div>
-
-                  </Popup>
-
-                </Marker>
-              ))}
+                  </Marker>
+                )
+              )}
 
             </MapContainer>
 
           )}
 
         </motion.div>
+
       </div>
     </section>
   );
