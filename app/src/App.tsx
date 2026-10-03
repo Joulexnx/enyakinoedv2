@@ -13,13 +13,11 @@ import { TYDGuide } from '@/sections/TYDGuide';
 import { Footer } from '@/sections/Footer';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 
-import { VolunteerModal } from '@/components/VolunteerModal';
 import { VolunteersPanel } from '@/components/VolunteersPanel';
-import { EmergencyCallButton } from '@/components/EmergencyCallButton';
 
 function HomePage() {
-  // Gönüllü kayıt sistemi ileride tekrar aktif edilecek.
-  // Mevcut GPS takip sistemi korunuyor.
+  // Gönüllü sistemi ileride tekrar aktif edilecek.
+  // Mevcut GPS takip altyapısı korunuyor.
   useVolunteerTracking();
 
   const {
@@ -69,33 +67,6 @@ function HomePage() {
       </main>
 
       <Footer />
-
-      {/* GÖNÜLLÜ OL - GEÇİCİ OLARAK PASİF */}
-      <button
-        disabled
-        className="fixed bottom-4 sm:bottom-8 right-4 sm:right-8 z-50 flex items-center gap-2 px-5 py-3.5 rounded-full bg-gray-400 text-white font-bold shadow-md cursor-not-allowed opacity-90"
-      >
-        <span className="text-lg">
-          🔒
-        </span>
-
-        <span className="text-sm">
-          Yakında Aktif
-        </span>
-      </button>
-
-      {/* GÖNÜLLÜ KAYIT MODALI
-          Daha sonra tekrar aktif edilebilir. */}
-      <VolunteerModal
-        isOpen={false}
-        onClose={() => {}}
-        userLocation={userLocation}
-      />
-
-      {/* ACİL DURUM BUTONU */}
-      <EmergencyCallButton
-        userLocation={userLocation}
-      />
     </div>
   );
 }
