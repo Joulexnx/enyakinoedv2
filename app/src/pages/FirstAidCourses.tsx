@@ -23,10 +23,13 @@ import {
   FileText,
   Loader2,
   AlertCircle,
+  Image,
+  Megaphone,
+  MessageCircle,
 } from 'lucide-react';
 
 const GOOGLE_SCRIPT_URL =
-  'https://script.google.com/macros/s/AKfycbw5QXscGxcBLbKEBSthTXuuYPoi_NQI5kEDjkgwSN8YMvq7qGbtPglJYj3awCWt6xYEXg/exec';
+  'https://script.google.com/macros/s/AKfycbwkZnYu3QWV-cItPyKAgOo8NutFhp-PASve32-RvEp6oGjvTp3A_X8bP99LW_kJB8jr1g/exec';
 
 const PAYMENT_URLS = {
   standardMonthly: 'https://linkode.me/UxMuMqvo2h',
@@ -60,11 +63,16 @@ const PACKAGE_OPTIONS: Array<{
     name: 'Premium',
     monthlyPrice: '2.000 TL / ay',
     yearlyPrice: '20.000 TL / yıl',
-    description: 'Standart pakete ek olarak Premium görünüm ve etiket.',
+    description: 'Standart pakete ek olarak daha görünür ve zengin bir profil.',
     features: [
       'Standart paketteki tüm özellikler',
       'Premium rozeti',
-      'Premium kart görünümü',
+      'Özel Premium profil kartı',
+      'Logo ve merkez fotoğrafları',
+      'WhatsApp iletişim butonu',
+      'Premium Eğitim Merkezi alanı',
+      'İlçe aramalarında öncelik',
+      'Duyuru alanı',
     ],
   },
 ];
@@ -86,6 +94,10 @@ type CourseCenter = {
   showWebsite: boolean;
   publishDate: string;
   endDate: string;
+  logo: string;
+  gallery: string[];
+  whatsapp: string;
+  announcement: string;
 };
 
 const districts = [
@@ -145,6 +157,55 @@ function normalizeCourses(value: unknown): string[] {
     .filter(Boolean);
 }
 
+
+function normalizeGallery(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => String(item).trim())
+      .filter(Boolean);
+  }
+
+  return String(value ?? '')
+    .split(/[,\r\n]+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function normalizeWhatsApp(value: unknown): string {
+  return String(value ?? '')
+    .replace(/[^0-9+]/g, '')
+    .trim();
+}
+
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const result = String(reader.result ?? '');
+      const commaIndex = result.indexOf(',');
+      resolve(
+        commaIndex >= 0
+          ? result.slice(commaIndex + 1)
+          : result,
+      );
+    };
+
+    reader.onerror = () => {
+      reject(new Error(`${file.name} okunamadı.`));
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
+function isSupportedImage(file: File): boolean {
+  return [
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+  ].includes(file.type);
+}
 function normalizePackage(value: unknown): string {
   const packageName = String(value ?? '').trim();
 
@@ -371,7 +432,33 @@ function normalizeCenter(
       'Bitis Tarihi',
       'endDate',
     ),
-  };
+
+    logo: getField(
+      item,
+      'logo',
+      'Logo',
+    ),
+
+    gallery: normalizeGallery(
+      item['galeri'] ??
+        item['Galeri'] ??
+        item['gallery'],
+    ),
+
+    whatsapp: normalizeWhatsApp(
+      getField(
+        item,
+        'whatsapp',
+        'WhatsApp',
+      ),
+    ),
+
+    announcement: getField(
+      item,
+      'duyuru',
+      'Duyuru',
+      'announcement',
+    ),  };
 }
 
 function CourseCenterCard({
@@ -388,7 +475,7 @@ function CourseCenterCard({
 
   return (
     <article
-      className={`group relative overflow-hidden rounded-3xl bg-white dark:bg-[var(--bg-card)] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
+      className={`group relative overflow-hidden rounded-3xl bg-[var(--bg-card)] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
         isPremium
           ? 'border border-[rgba(23,106,246,0.45)] ring-1 ring-[rgba(23,106,246,0.08)]'
           : 'border border-[var(--border-subtle)]'
@@ -404,7 +491,7 @@ function CourseCenterCard({
           )}
 
           {isPremium && (
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-slate-900 dark:bg-white px-3 py-1.5 text-[11px] font-semibold text-white dark:text-slate-900 shadow-md">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-[var(--accent-blue)] px-3 py-1.5 text-[11px] font-semibold text-white shadow-md">
               <Star className="w-3.5 h-3.5 fill-current" />
               Premium
             </div>
@@ -415,11 +502,20 @@ function CourseCenterCard({
       <div className="p-6">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-2xl bg-[rgba(23,106,246,0.09)] text-[var(--accent-blue)] flex items-center justify-center flex-shrink-0">
-            <Building2 className="w-6 h-6" />
+            {isPremium && center.logo ? (
+              <img
+                src={center.logo}
+                alt={`${center.name} logosu`}
+                className="w-full h-full object-contain"
+                loading="lazy"
+              />
+            ) : (
+              <Building2 className="w-6 h-6" />
+            )}
           </div>
 
           <div className="min-w-0 pr-16">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white leading-snug">
+            <h3 className="text-lg font-semibold text-[var(--text-primary)] leading-snug">
               {center.name || 'Eğitim Merkezi'}
             </h3>
 
@@ -438,6 +534,34 @@ function CourseCenterCard({
           <div className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-[rgba(23,106,246,0.08)] px-2.5 py-1.5 text-xs font-semibold text-[var(--accent-blue)]">
             <Star className="w-3.5 h-3.5 fill-current" />
             Premium paket
+          </div>
+        )}
+
+        {isPremium && center.announcement && (
+          <div className="mt-4 rounded-2xl border border-[rgba(23,106,246,0.14)] bg-[rgba(23,106,246,0.05)] p-4">
+            <div className="flex items-start gap-2.5">
+              <Megaphone className="w-4 h-4 mt-0.5 text-[var(--accent-blue)] flex-shrink-0" />
+              <div>
+                <div className="text-xs font-semibold text-[var(--accent-blue)]">Duyuru</div>
+                <p className="mt-1 text-sm text-[var(--text-secondary)] leading-relaxed">
+                  {center.announcement}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isPremium && center.gallery.length > 0 && (
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            {center.gallery.slice(0, 3).map((imageUrl, index) => (
+              <img
+                key={`${imageUrl}-${index}`}
+                src={imageUrl}
+                alt={`${center.name} fotoğrafı ${index + 1}`}
+                className="w-full h-24 sm:h-28 object-cover rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)]"
+                loading="lazy"
+              />
+            ))}
           </div>
         )}
 
@@ -489,7 +613,7 @@ function CourseCenterCard({
           )}
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-3">
+        <div className={`mt-6 grid gap-3 ${isPremium && center.whatsapp ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-2'}`}>
           <a
             href={mapsUrl}
             target="_blank"
@@ -500,6 +624,18 @@ function CourseCenterCard({
             Yol Tarifi
           </a>
 
+          {isPremium && center.whatsapp ? (
+            <a
+              href={`https://wa.me/${center.whatsapp.replace(/^\+/, '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-all"
+            >
+              <MessageCircle className="w-4 h-4" />
+              WhatsApp
+            </a>
+          ) : null}
+
           {center.showWebsite && center.website ? (
             <a
               href={
@@ -509,7 +645,7 @@ function CourseCenterCard({
               }
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 h-11 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-slate-900 dark:text-white text-sm font-semibold hover:border-[var(--accent-blue)] hover:text-[var(--accent-blue)] transition-all"
+              className="inline-flex items-center justify-center gap-2 h-11 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-[var(--text-primary)] text-sm font-semibold hover:border-[var(--accent-blue)] hover:text-[var(--accent-blue)] transition-all"
             >
               <Globe className="w-4 h-4" />
               Web Sitesi
@@ -534,7 +670,7 @@ function FieldLabel({
   required?: boolean;
 }) {
   return (
-    <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+    <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
       {children}
       {required && (
         <span className="text-red-500 ml-1">*</span>
@@ -578,7 +714,7 @@ function InputField({
             onChange(event.target.value)
           }
           placeholder={placeholder}
-          className="w-full h-12 pl-11 pr-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-slate-900 dark:text-white placeholder:text-[var(--text-secondary)] outline-none focus:border-[var(--accent-blue)] focus:ring-2 focus:ring-[rgba(23,106,246,0.12)] transition-all"
+          className="w-full h-12 pl-11 pr-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] outline-none focus:border-[var(--accent-blue)] focus:ring-2 focus:ring-[rgba(23,106,246,0.12)] transition-all"
         />
       </div>
     </div>
@@ -603,8 +739,19 @@ function ListingApplicationModal({
     address: '',
     website: '',
     description: '',
+    logo: '',
+    gallery: '',
+    whatsapp: '',
+    announcement: '',
     kvkk: false,
   });
+
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
+  const [logoPreview, setLogoPreview] = useState('');
+  const [galleryPreviews, setGalleryPreviews] = useState<
+    Array<{ file: File; url: string }>
+  >([]);
 
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
   const [selectedPackage, setSelectedPackage] =
@@ -648,6 +795,92 @@ function ListingApplicationModal({
     }));
   };
 
+  const handleLogoChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (!isSupportedImage(file)) {
+      setError('Logo için JPG, PNG veya WEBP dosyası seçebilirsiniz.');
+      event.target.value = '';
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Logo dosyası en fazla 2 MB olabilir.');
+      event.target.value = '';
+      return;
+    }
+
+    if (logoPreview) {
+      URL.revokeObjectURL(logoPreview);
+    }
+
+    setLogoFile(file);
+    setLogoPreview(URL.createObjectURL(file));
+    setError('');
+  };
+
+  const handleGalleryChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const files = Array.from(event.target.files ?? []);
+
+    if (files.length === 0) {
+      return;
+    }
+
+    const combined = [...galleryFiles, ...files];
+
+    if (combined.length > 5) {
+      setError('En fazla 5 merkez fotoğrafı yükleyebilirsiniz.');
+      event.target.value = '';
+      return;
+    }
+
+    if (combined.some((file) => !isSupportedImage(file))) {
+      setError('Merkez fotoğrafları JPG, PNG veya WEBP formatında olmalıdır.');
+      event.target.value = '';
+      return;
+    }
+
+    if (combined.some((file) => file.size > 4 * 1024 * 1024)) {
+      setError('Her merkez fotoğrafı en fazla 4 MB olabilir.');
+      event.target.value = '';
+      return;
+    }
+
+    const newFiles = files.map((file) => ({
+      file,
+      url: URL.createObjectURL(file),
+    }));
+
+    setGalleryFiles(combined);
+    setGalleryPreviews((current) => [...current, ...newFiles]);
+    setError('');
+    event.target.value = '';
+  };
+
+  const removeGalleryFile = (index: number) => {
+    const preview = galleryPreviews[index];
+
+    if (preview) {
+      URL.revokeObjectURL(preview.url);
+    }
+
+    setGalleryFiles((current) =>
+      current.filter((_, fileIndex) => fileIndex !== index),
+    );
+
+    setGalleryPreviews((current) =>
+      current.filter((_, previewIndex) => previewIndex !== index),
+    );
+  };
+
   const handleSubmit = async (
     event: React.FormEvent,
   ) => {
@@ -670,6 +903,18 @@ function ListingApplicationModal({
       return;
     }
 
+    if (selectedPackage === 'Premium') {
+      if (logoFile && !isSupportedImage(logoFile)) {
+        setError('Logo için JPG, PNG veya WEBP dosyası seçebilirsiniz.');
+        return;
+      }
+
+      if (galleryFiles.length > 5) {
+        setError('En fazla 5 merkez fotoğrafı yükleyebilirsiniz.');
+        return;
+      }
+    }
+
     setSubmitting(true);
 
     try {
@@ -683,6 +928,30 @@ function ListingApplicationModal({
         website: form.website.trim(),
         courses: selectedCourses.join(', '),
         description: form.description.trim(),
+        whatsapp: selectedPackage === 'Premium' ? form.whatsapp.trim() : '',
+        announcement:
+          selectedPackage === 'Premium'
+            ? form.announcement.trim()
+            : '',
+        uploads:
+          selectedPackage === 'Premium'
+            ? {
+                logo: logoFile
+                  ? {
+                      name: logoFile.name,
+                      type: logoFile.type,
+                      data: await fileToBase64(logoFile),
+                    }
+                  : null,
+                gallery: await Promise.all(
+                  galleryFiles.map(async (file) => ({
+                    name: file.name,
+                    type: file.type,
+                    data: await fileToBase64(file),
+                  })),
+                ),
+              }
+            : null,
         kvkk: form.kvkk,
         package: selectedPackage,
         paymentPeriod,
@@ -700,6 +969,8 @@ function ListingApplicationModal({
         },
       );
 
+      const responseText = await response.text();
+
       if (!response.ok) {
         throw new Error(
           'Başvuru gönderilemedi.',
@@ -709,22 +980,18 @@ function ListingApplicationModal({
       let result:
         | {
             success?: boolean;
-            başarılı?: boolean;
             message?: string;
             mesaj?: string;
           }
         | null = null;
 
       try {
-        result = await response.json();
+        result = JSON.parse(responseText);
       } catch {
         result = null;
       }
 
-      if (
-        result?.success === false ||
-        result?.başarılı === false
-      ) {
+      if (result?.success === false) {
         throw new Error(
           result.message ||
             result.mesaj ||
@@ -766,8 +1033,8 @@ function ListingApplicationModal({
         }
       />
 
-      <div className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-3xl bg-white dark:bg-[var(--bg-card)] shadow-2xl border border-[var(--border-subtle)] text-slate-900 dark:text-white">
-        <div className="sticky top-0 z-10 flex items-center justify-between gap-4 px-5 sm:px-7 py-4 border-b border-[var(--border-subtle)] bg-white dark:bg-[var(--bg-card)]">
+      <div className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-3xl bg-[var(--bg-card)] shadow-2xl border border-[var(--border-subtle)] text-[var(--text-primary)]">
+        <div className="sticky top-0 z-10 flex items-center justify-between gap-4 px-5 sm:px-7 py-4 border-b border-[var(--border-subtle)] bg-[var(--bg-card)]">
           <div>
             <div className="flex items-center gap-2 text-[var(--accent-blue)] text-xs font-semibold">
               <Building2 className="w-4 h-4" />
@@ -776,7 +1043,7 @@ function ListingApplicationModal({
 
             <h2
               id="listing-modal-title"
-              className="mt-1 text-lg sm:text-xl font-bold text-slate-900 dark:text-white"
+              className="mt-1 text-lg sm:text-xl font-bold text-[var(--text-primary)]"
             >
               Eğitim merkezinizi listeleyin
             </h2>
@@ -786,7 +1053,7 @@ function ListingApplicationModal({
             type="button"
             onClick={onClose}
             disabled={submitting}
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors disabled:opacity-40"
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--border-subtle)] transition-colors disabled:opacity-40"
             aria-label="Kapat"
           >
             <X className="w-5 h-5" />
@@ -799,7 +1066,7 @@ function ListingApplicationModal({
               <CheckCircle2 className="w-8 h-8" />
             </div>
 
-            <h3 className="mt-6 text-2xl font-bold text-slate-900 dark:text-white">
+            <h3 className="mt-6 text-2xl font-bold text-[var(--text-primary)]">
               Başvurunuz başarıyla alındı
             </h3>
 
@@ -825,7 +1092,7 @@ function ListingApplicationModal({
                   <ShieldCheck className="w-5 h-5 text-[var(--accent-blue)] mt-0.5 flex-shrink-0" />
 
                   <div>
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                    <p className="text-sm font-semibold text-[var(--text-primary)]">
                       Platformda yer almak için başvurun
                     </p>
 
@@ -843,7 +1110,7 @@ function ListingApplicationModal({
               <section>
                 <div className="flex items-center gap-2 mb-4">
                   <Building2 className="w-5 h-5 text-[var(--accent-blue)]" />
-                  <h3 className="font-semibold text-slate-900 dark:text-white">
+                  <h3 className="font-semibold text-[var(--text-primary)]">
                     Eğitim Merkezi Bilgileri
                   </h3>
                 </div>
@@ -920,7 +1187,7 @@ function ListingApplicationModal({
               <section>
                 <div className="flex items-center gap-2 mb-4">
                   <MapPin className="w-5 h-5 text-[var(--accent-blue)]" />
-                  <h3 className="font-semibold text-slate-900 dark:text-white">
+                  <h3 className="font-semibold text-[var(--text-primary)]">
                     Konum ve İletişim
                   </h3>
                 </div>
@@ -940,12 +1207,12 @@ function ListingApplicationModal({
                             event.target.value,
                           )
                         }
-                        className="appearance-none w-full h-12 px-4 pr-10 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-slate-900 dark:text-white outline-none focus:border-[var(--accent-blue)] transition-all cursor-pointer"
+                        className="appearance-none w-full h-12 px-4 pr-10 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-blue)] transition-all cursor-pointer"
                         required
                       >
                         <option
                           value=""
-                          className="text-slate-900"
+                          className="text-[var(--text-primary)]"
                         >
                           İlçe seçin
                         </option>
@@ -960,7 +1227,7 @@ function ListingApplicationModal({
                             <option
                               key={district}
                               value={district}
-                              className="text-slate-900"
+                              className="text-[var(--text-primary)]"
                             >
                               {district}
                             </option>
@@ -986,7 +1253,7 @@ function ListingApplicationModal({
                       }
                       placeholder="Eğitim merkezinizin açık adresini yazın."
                       rows={3}
-                      className="w-full px-4 py-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-slate-900 dark:text-white placeholder:text-[var(--text-secondary)] outline-none resize-none focus:border-[var(--accent-blue)] transition-all"
+                      className="w-full px-4 py-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] outline-none resize-none focus:border-[var(--accent-blue)] transition-all"
                       required
                     />
                   </div>
@@ -1013,7 +1280,7 @@ function ListingApplicationModal({
                 <div className="flex items-center gap-2 mb-4">
                   <BookOpen className="w-5 h-5 text-[var(--accent-blue)]" />
 
-                  <h3 className="font-semibold text-slate-900 dark:text-white">
+                  <h3 className="font-semibold text-[var(--text-primary)]">
                     Verdiğiniz Eğitimler
                     <span className="text-red-500 ml-1">
                       *
@@ -1057,7 +1324,7 @@ function ListingApplicationModal({
                           )}
                         </div>
 
-                        <span className="text-xs sm:text-sm font-medium text-slate-900 dark:text-white">
+                        <span className="text-xs sm:text-sm font-medium text-[var(--text-primary)]">
                           {course}
                         </span>
                       </button>
@@ -1069,7 +1336,7 @@ function ListingApplicationModal({
               <section>
                 <div className="flex items-center gap-2 mb-4">
                   <Star className="w-5 h-5 text-[var(--accent-blue)]" />
-                  <h3 className="font-semibold text-slate-900 dark:text-white">
+                  <h3 className="font-semibold text-[var(--text-primary)]">
                     Paket Seçimi
                   </h3>
                 </div>
@@ -1093,7 +1360,7 @@ function ListingApplicationModal({
                         }`}
                       >
                         {option.name === 'Premium' && (
-                          <span className="absolute top-4 right-4 inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[10px] font-bold text-white">
+                          <span className="absolute top-4 right-4 inline-flex items-center gap-1 rounded-full bg-[var(--text-primary)] px-2.5 py-1 text-[10px] font-bold text-[var(--bg-card)]">
                             <Star className="w-3 h-3 fill-current" />
                             PREMIUM
                           </span>
@@ -1115,7 +1382,7 @@ function ListingApplicationModal({
                           </div>
 
                           <div>
-                            <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                            <h4 className="text-base font-bold text-[var(--text-primary)]">
                               {option.name} Paket
                             </h4>
                             <p className="mt-1 text-xs text-[var(--text-secondary)] leading-relaxed">
@@ -1146,7 +1413,7 @@ function ListingApplicationModal({
               <section>
                 <div className="flex items-center gap-2 mb-4">
                   <Clock3 className="w-5 h-5 text-[var(--accent-blue)]" />
-                  <h3 className="font-semibold text-slate-900 dark:text-white">
+                  <h3 className="font-semibold text-[var(--text-primary)]">
                     Ödeme Dönemi
                   </h3>
                 </div>
@@ -1187,7 +1454,7 @@ function ListingApplicationModal({
                             className={`w-5 h-5 rounded-full border flex items-center justify-center flex-shrink-0 ${
                               selected
                                 ? 'border-[var(--accent-blue)]'
-                                : 'border-slate-300 dark:border-slate-600'
+                                : 'border-[var(--border-subtle)]'
                             }`}
                           >
                             {selected && (
@@ -1196,7 +1463,7 @@ function ListingApplicationModal({
                           </div>
 
                           <div>
-                            <div className="text-sm font-semibold text-slate-900 dark:text-white">
+                            <div className="text-sm font-semibold text-[var(--text-primary)]">
                               {option.period}
                             </div>
                             <div className="mt-0.5 text-xs text-[var(--text-secondary)]">
@@ -1218,7 +1485,7 @@ function ListingApplicationModal({
                     <span className="text-xs text-[var(--text-secondary)]">
                       Seçiminiz
                     </span>
-                    <span className="text-sm font-bold text-slate-900 dark:text-white">
+                    <span className="text-sm font-bold text-[var(--text-primary)]">
                       {selectedPackage} • {paymentPeriod} • {selectedPrice}
                     </span>
                   </div>
@@ -1229,7 +1496,7 @@ function ListingApplicationModal({
                 <div className="flex items-center gap-2 mb-4">
                   <FileText className="w-5 h-5 text-[var(--accent-blue)]" />
 
-                  <h3 className="font-semibold text-slate-900 dark:text-white">
+                  <h3 className="font-semibold text-[var(--text-primary)]">
                     Eğitim Merkezi Hakkında
                   </h3>
                 </div>
@@ -1244,10 +1511,158 @@ function ListingApplicationModal({
                   }
                   placeholder="Eğitim merkeziniz ve sunduğunuz hizmetler hakkında kısa bilgi verebilirsiniz."
                   rows={4}
-                  className="w-full px-4 py-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-slate-900 dark:text-white placeholder:text-[var(--text-secondary)] outline-none resize-none focus:border-[var(--accent-blue)] transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] outline-none resize-none focus:border-[var(--accent-blue)] transition-all"
                 />
               </section>
 
+              {selectedPackage === 'Premium' && (
+                <section>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Star className="w-5 h-5 text-[var(--accent-blue)]" />
+                    <h3 className="font-semibold text-[var(--text-primary)]">
+                      Premium Profil Bilgileri
+                    </h3>
+                  </div>
+
+                  <div className="rounded-2xl border border-[rgba(23,106,246,0.14)] bg-[rgba(23,106,246,0.05)] p-4 mb-4">
+                    <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
+                      Premium profilinizi zenginleştirmek için logo,
+                      merkez fotoğrafları, WhatsApp numarası ve duyuru
+                      bilgilerinizi ekleyebilirsiniz.
+                    </p>
+                  </div>
+
+                  <div className="space-y-5">
+                    <div>
+                      <FieldLabel>
+                        Logo
+                      </FieldLabel>
+
+                      <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
+                        <label className="inline-flex items-center justify-center gap-2 h-12 px-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm font-semibold text-[var(--text-primary)] hover:border-[var(--accent-blue)] hover:text-[var(--accent-blue)] cursor-pointer transition-all">
+                          <Image className="w-4 h-4" />
+                          Logo Seç
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            onChange={handleLogoChange}
+                            className="sr-only"
+                          />
+                        </label>
+
+                        {logoFile && (
+                          <div className="flex items-center gap-3">
+                            {logoPreview && (
+                              <img
+                                src={logoPreview}
+                                alt="Logo önizleme"
+                                className="w-12 h-12 rounded-xl object-contain border border-[var(--border-subtle)] bg-[var(--bg-primary)]"
+                              />
+                            )}
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium text-[var(--text-primary)] truncate max-w-[240px]">
+                                {logoFile.name}
+                              </p>
+                              <p className="text-xs text-[var(--text-secondary)]">
+                                {(logoFile.size / 1024 / 1024).toFixed(2)} MB
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <p className="mt-2 text-xs text-[var(--text-secondary)]">
+                        JPG, PNG veya WEBP • Maksimum 2 MB
+                      </p>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between gap-3">
+                        <FieldLabel>
+                          Merkez Fotoğrafları
+                        </FieldLabel>
+                        <span className="text-xs text-[var(--text-secondary)]">
+                          {galleryFiles.length}/5
+                        </span>
+                      </div>
+
+                      <label className="flex flex-col items-center justify-center gap-2 min-h-28 rounded-2xl border border-dashed border-[var(--border-subtle)] bg-[var(--bg-primary)] px-4 py-5 text-center hover:border-[var(--accent-blue)] transition-all cursor-pointer">
+                        <Image className="w-6 h-6 text-[var(--accent-blue)]" />
+                        <span className="text-sm font-semibold text-[var(--text-primary)]">
+                          Fotoğraf Ekle
+                        </span>
+                        <span className="text-xs text-[var(--text-secondary)]">
+                          En fazla 5 fotoğraf • Her biri 4 MB
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          multiple
+                          onChange={handleGalleryChange}
+                          disabled={galleryFiles.length >= 5}
+                          className="sr-only"
+                        />
+                      </label>
+
+                      {galleryPreviews.length > 0 && (
+                        <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          {galleryPreviews.map((item, index) => (
+                            <div
+                              key={`${item.file.name}-${index}`}
+                              className="relative overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)]"
+                            >
+                              <img
+                                src={item.url}
+                                alt={`Merkez fotoğrafı ${index + 1}`}
+                                className="w-full h-28 object-cover"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => removeGalleryFile(index)}
+                                className="absolute top-2 right-2 w-8 h-8 rounded-lg bg-black/65 text-white flex items-center justify-center hover:bg-black/80 transition-colors"
+                                aria-label={`${index + 1}. fotoğrafı kaldır`}
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <InputField
+                      icon={<MessageCircle className="w-4 h-4" />}
+                      label="WhatsApp"
+                      placeholder="905XXXXXXXXX"
+                      value={form.whatsapp}
+                      onChange={(value) =>
+                        updateField('whatsapp', value)
+                      }
+                      type="tel"
+                    />
+
+                    <div>
+                      <FieldLabel>
+                        Duyuru
+                      </FieldLabel>
+
+                      <textarea
+                        value={form.announcement}
+                        onChange={(event) =>
+                          updateField(
+                            'announcement',
+                            event.target.value,
+                          )
+                        }
+                        placeholder="Örn. Ekim ayı ilk yardım eğitim kayıtlarımız başladı."
+                        rows={3}
+                        maxLength={300}
+                        className="w-full px-4 py-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] outline-none resize-none focus:border-[var(--accent-blue)] transition-all"
+                      />
+                    </div>
+                  </div>
+                </section>
+              )}
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -1285,7 +1700,7 @@ function ListingApplicationModal({
               )}
             </div>
 
-            <div className="sticky bottom-0 border-t border-[var(--border-subtle)] bg-white dark:bg-[var(--bg-card)] px-5 sm:px-7 py-4">
+            <div className="sticky bottom-0 border-t border-[var(--border-subtle)] bg-[var(--bg-card)] px-5 sm:px-7 py-4">
               <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
                 <p className="text-xs text-[var(--text-secondary)]">
                   <span className="text-red-500">*</span>{' '}
@@ -1297,7 +1712,7 @@ function ListingApplicationModal({
                     type="button"
                     onClick={onClose}
                     disabled={submitting}
-                    className="h-11 px-5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-transparent text-slate-900 dark:text-white text-sm font-medium hover:bg-slate-100 dark:hover:bg-white/10 transition-all disabled:opacity-50"
+                    className="h-11 px-5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-card)] text-[var(--text-primary)] text-sm font-medium hover:bg-[var(--border-subtle)] transition-all disabled:opacity-50"
                   >
                     Vazgeç
                   </button>
@@ -1310,7 +1725,7 @@ function ListingApplicationModal({
                     {submitting ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        Kaydediliyor...
+                        Dosyalar yükleniyor...
                       </>
                     ) : (
                       <>
@@ -1373,7 +1788,7 @@ export default function FirstAidCourses() {
         const data = await response.json();
 
         const apiSuccess =
-          data?.başarılı ??
+          
           data?.basarili ??
           data?.success ??
           true;
@@ -1515,8 +1930,8 @@ export default function FirstAidCourses() {
   ]);
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] text-slate-900 dark:text-white">
-      <header className="sticky top-0 z-50 border-b border-[var(--border-subtle)] bg-white/90 dark:bg-[var(--bg-card)]/90 backdrop-blur-xl">
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]">
+      <header className="sticky top-0 z-50 border-b border-[var(--border-subtle)] bg-[var(--bg-card)]/90 backdrop-blur-xl">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
           <div className="h-16 flex items-center justify-between">
             <button
@@ -1524,7 +1939,7 @@ export default function FirstAidCourses() {
               onClick={() => {
                 window.location.href = '/';
               }}
-              className="flex items-center gap-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[var(--accent-blue)] transition-colors"
+              className="flex items-center gap-2.5 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--accent-blue)] transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Ana Sayfa
@@ -1536,7 +1951,7 @@ export default function FirstAidCourses() {
               </div>
 
               <div className="hidden sm:block">
-                <div className="text-sm font-bold leading-none text-slate-900 dark:text-white">
+                <div className="text-sm font-bold leading-none text-[var(--text-primary)]">
                   En Yakın OED
                 </div>
 
@@ -1558,7 +1973,7 @@ export default function FirstAidCourses() {
                 En Yakın OED İlk Yardım Ağı
               </div>
 
-              <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-tight text-slate-900 dark:text-white">
+              <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-tight text-[var(--text-primary)]">
                 Ankara'da İlk Yardım
                 <br className="hidden sm:block" />
                 Eğitimi Alın
@@ -1584,7 +1999,7 @@ export default function FirstAidCourses() {
                         )
                       }
                       placeholder="Kurs merkezi veya ilçe ara..."
-                      className="w-full h-14 pl-12 pr-4 rounded-2xl border border-[var(--border-subtle)] bg-white dark:bg-[var(--bg-card)] text-sm sm:text-base text-slate-900 dark:text-white placeholder:text-[var(--text-secondary)] outline-none focus:ring-2 focus:ring-[rgba(23,106,246,0.2)] focus:border-[var(--accent-blue)] transition-all shadow-sm"
+                      className="w-full h-14 pl-12 pr-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-card)] text-sm sm:text-base text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] outline-none focus:ring-2 focus:ring-[rgba(23,106,246,0.2)] focus:border-[var(--accent-blue)] transition-all shadow-sm"
                     />
                   </div>
 
@@ -1596,14 +2011,14 @@ export default function FirstAidCourses() {
                           event.target.value,
                         )
                       }
-                      className="appearance-none w-full h-14 px-4 pr-10 rounded-2xl border border-[var(--border-subtle)] bg-white dark:bg-[var(--bg-card)] text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-[rgba(23,106,246,0.2)] focus:border-[var(--accent-blue)] transition-all shadow-sm cursor-pointer"
+                      className="appearance-none w-full h-14 px-4 pr-10 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-card)] text-sm text-[var(--text-primary)] outline-none focus:ring-2 focus:ring-[rgba(23,106,246,0.2)] focus:border-[var(--accent-blue)] transition-all shadow-sm cursor-pointer"
                     >
                       {districts.map(
                         (district) => (
                           <option
                             key={district}
                             value={district}
-                            className="text-slate-900"
+                            className="text-[var(--text-primary)]"
                           >
                             {district}
                           </option>
@@ -1636,10 +2051,10 @@ export default function FirstAidCourses() {
           </div>
         </section>
 
-        <section className="py-10 sm:py-14 bg-white dark:bg-[var(--bg-card)] border-y border-[var(--border-subtle)]">
+        <section className="py-10 sm:py-14 bg-[var(--bg-card)] border-y border-[var(--border-subtle)]">
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
             <div className="text-center mb-8">
-              <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
+              <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-[var(--text-primary)]">
                 Eğitim Seçeneklerini Keşfedin
               </h2>
 
@@ -1660,7 +2075,7 @@ export default function FirstAidCourses() {
                     {item.icon}
                   </div>
 
-                  <h3 className="font-semibold text-base text-slate-900 dark:text-white">
+                  <h3 className="font-semibold text-base text-[var(--text-primary)]">
                     {item.title}
                   </h3>
 
@@ -1683,7 +2098,7 @@ export default function FirstAidCourses() {
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-7">
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
+                  <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-[var(--text-primary)]">
                     Eğitim Merkezleri
                   </h2>
 
@@ -1707,10 +2122,10 @@ export default function FirstAidCourses() {
             </div>
 
             {loading ? (
-              <div className="rounded-3xl border border-[var(--border-subtle)] bg-white dark:bg-[var(--bg-card)] p-12 text-center shadow-sm">
+              <div className="rounded-3xl border border-[var(--border-subtle)] bg-[var(--bg-card)] p-12 text-center shadow-sm">
                 <Loader2 className="w-9 h-9 mx-auto text-[var(--accent-blue)] animate-spin" />
 
-                <h3 className="mt-5 text-lg font-semibold text-slate-900 dark:text-white">
+                <h3 className="mt-5 text-lg font-semibold text-[var(--text-primary)]">
                   Eğitim merkezleri yükleniyor
                 </h3>
 
@@ -1719,12 +2134,12 @@ export default function FirstAidCourses() {
                 </p>
               </div>
             ) : loadError ? (
-              <div className="rounded-3xl border border-red-200 dark:border-red-500/20 bg-white dark:bg-[var(--bg-card)] p-8 sm:p-12 text-center shadow-sm">
+              <div className="rounded-3xl border border-red-200 dark:border-red-500/20 bg-[var(--bg-card)] p-8 sm:p-12 text-center shadow-sm">
                 <div className="w-14 h-14 mx-auto rounded-2xl bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center">
                   <AlertCircle className="w-7 h-7" />
                 </div>
 
-                <h3 className="mt-5 text-lg font-semibold text-slate-900 dark:text-white">
+                <h3 className="mt-5 text-lg font-semibold text-[var(--text-primary)]">
                   Liste yüklenemedi
                 </h3>
 
@@ -1754,13 +2169,13 @@ export default function FirstAidCourses() {
                 )}
               </div>
             ) : (
-              <div className="rounded-3xl border border-[var(--border-subtle)] bg-white dark:bg-[var(--bg-card)] overflow-hidden shadow-sm">
+              <div className="rounded-3xl border border-[var(--border-subtle)] bg-[var(--bg-card)] overflow-hidden shadow-sm">
                 <div className="p-8 sm:p-12 text-center">
                   <div className="w-16 h-16 mx-auto rounded-2xl bg-[rgba(23,106,246,0.08)] text-[var(--accent-blue)] flex items-center justify-center">
                     <Building2 className="w-8 h-8" />
                   </div>
 
-                  <h3 className="mt-6 text-xl font-semibold text-slate-900 dark:text-white">
+                  <h3 className="mt-6 text-xl font-semibold text-[var(--text-primary)]">
                     {courseCenters.length > 0
                       ? 'Aramanıza uygun merkez bulunamadı'
                       : 'Henüz listelenen eğitim merkezi yok'}
@@ -1802,7 +2217,7 @@ export default function FirstAidCourses() {
 
         <section
           id="course-listing"
-          className="py-12 sm:py-16 bg-white dark:bg-[var(--bg-card)] border-y border-[var(--border-subtle)]"
+          className="py-12 sm:py-16 bg-[var(--bg-card)] border-y border-[var(--border-subtle)]"
         >
           <div className="max-w-[1100px] mx-auto px-4 sm:px-6">
             <div className="rounded-3xl bg-[var(--bg-primary)] border border-[var(--border-subtle)] overflow-hidden">
@@ -1814,7 +2229,7 @@ export default function FirstAidCourses() {
                       Eğitim merkezleri için
                     </div>
 
-                    <h2 className="mt-4 text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+                    <h2 className="mt-4 text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
                       Eğitim merkezinizi
                       <br className="hidden sm:block" />
                       En Yakın OED'de listeleyin
@@ -1872,7 +2287,7 @@ export default function FirstAidCourses() {
               <ShieldCheck className="w-6 h-6" />
             </div>
 
-            <h2 className="mt-5 text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white">
+            <h2 className="mt-5 text-xl sm:text-2xl font-semibold text-[var(--text-primary)]">
               En Yakın OED İlk Yardım Eğitim Ağı
             </h2>
 
@@ -1915,3 +2330,9 @@ export default function FirstAidCourses() {
     </div>
   );
 }
+
+
+
+
+
+
