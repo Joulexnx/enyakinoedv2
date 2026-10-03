@@ -1,19 +1,7 @@
-{
+﻿{
   "rewrites": [
     {
-      "source": "/gizlilik-politikasi",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/gizlilik-politikasi/",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/ilk-yardim-kurslari",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/ilk-yardim-kurslari/",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
