@@ -48,12 +48,10 @@ const navItems = [
 export function MobileBottomNav({
   activeItem = 'home',
 }: MobileBottomNavProps) {
-
   const [currentItem, setCurrentItem] =
     useState(activeItem);
 
   const handleNavigation = (action: string) => {
-
     /* ANA SAYFA */
     if (action === 'home') {
       setCurrentItem('home');
@@ -166,172 +164,167 @@ export function MobileBottomNav({
   };
 
   return (
-    <nav
-      className="fixed bottom-0 left-0 right-0 z-[70] sm:hidden"
-      aria-label="Mobil navigasyon"
-    >
-      <div className="mx-2 mb-2">
-
-        <div
-          className="
-            relative
-            overflow-hidden
-            rounded-2xl
-            border
-            border-[var(--border-subtle)]
-            bg-[var(--bg-card)]/[0.97]
-            shadow-[0_-8px_35px_rgba(0,0,0,0.35)]
-            backdrop-blur-xl
-          "
-        >
-
-          {/* Üst parlama */}
+    <>
+      {/* SABİT MOBİL ALT MENÜ */}
+      <nav
+        className="
+          fixed
+          bottom-0
+          left-0
+          right-0
+          z-[70]
+          sm:hidden
+        "
+        aria-label="Mobil navigasyon"
+      >
+        <div className="mx-2 mb-2">
           <div
             className="
-              pointer-events-none
-              absolute
-              left-0
-              right-0
-              top-0
-              h-px
-              bg-gradient-to-r
-              from-transparent
-              via-[var(--text-primary)]/15
-              to-transparent
+              relative
+              overflow-hidden
+              rounded-2xl
+              border
+              border-[#2a3040]
+              bg-[#11141d]
+              shadow-[0_-8px_35px_rgba(0,0,0,0.45)]
             "
-          />
+          >
+            <div className="grid grid-cols-5 h-[72px] px-1">
+              {navItems.map((item) => {
+                const Icon = item.icon;
 
-          <div className="grid grid-cols-5 h-[72px] px-1">
+                const isActive =
+                  currentItem === item.id;
 
-            {navItems.map((item) => {
-
-              const Icon = item.icon;
-
-              const isActive =
-                currentItem === item.id;
-
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() =>
-                    handleNavigation(
-                      item.action
-                    )
-                  }
-                  className="
-                    relative
-                    flex
-                    flex-col
-                    items-center
-                    justify-center
-                    gap-1
-                    transition-all
-                    duration-200
-                    active:scale-95
-                  "
-                  aria-label={item.label}
-                  aria-current={
-                    isActive
-                      ? 'page'
-                      : undefined
-                  }
-                >
-
-                  {/* Aktif arka plan */}
-                  {isActive && (
-                    <div
-                      className="
-                        absolute
-                        top-1.5
-                        w-12
-                        h-8
-                        rounded-xl
-                        bg-[var(--accent-blue-light)]
-                      "
-                    />
-                  )}
-
-                  {/* Aktif üst çizgi */}
-                  {isActive && (
-                    <div
-                      className="
-                        absolute
-                        top-0.5
-                        w-7
-                        h-0.5
-                        rounded-full
-                        bg-[var(--accent-blue)]
-                        shadow-[0_0_10px_rgba(59,130,246,0.7)]
-                      "
-                    />
-                  )}
-
-                  {/* İkon */}
-                  <div
-                    className={`
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() =>
+                      handleNavigation(
+                        item.action
+                      )
+                    }
+                    className="
                       relative
-                      z-10
                       flex
+                      flex-col
                       items-center
                       justify-center
-                      w-7
-                      h-7
-                      transition-all
+                      gap-1
+                      transition-transform
                       duration-200
-                      ${
-                        isActive
-                          ? 'text-[var(--accent-blue)]'
-                          : 'text-[var(--text-muted)]'
-                      }
-                    `}
+                      active:scale-95
+                    "
+                    aria-label={item.label}
+                    aria-current={
+                      isActive
+                        ? 'page'
+                        : undefined
+                    }
                   >
-                    <Icon
-                      className="w-[20px] h-[20px]"
-                      strokeWidth={
-                        isActive
-                          ? 2.5
-                          : 1.9
-                      }
-                    />
-                  </div>
+                    {/* SADECE AKTİF ÖĞENİN ARKA PLANI */}
+                    {isActive && (
+                      <div
+                        className="
+                          absolute
+                          top-1.5
+                          w-12
+                          h-8
+                          rounded-xl
+                          bg-[#1d4ed8]/20
+                        "
+                      />
+                    )}
 
-                  {/* Yazı */}
-                  <span
-                    className={`
-                      relative
-                      z-10
-                      text-[9px]
-                      font-semibold
-                      leading-none
-                      transition-colors
-                      duration-200
-                      ${
-                        isActive
-                          ? 'text-[var(--accent-blue)]'
-                          : 'text-[var(--text-muted)]'
-                      }
-                    `}
-                  >
-                    {item.label}
-                  </span>
+                    {/* SADECE AKTİF ÖĞENİN ÜST ÇİZGİSİ */}
+                    {isActive && (
+                      <div
+                        className="
+                          absolute
+                          top-0.5
+                          w-7
+                          h-0.5
+                          rounded-full
+                          bg-[#3b82f6]
+                        "
+                      />
+                    )}
 
-                </button>
-              );
-            })}
+                    {/* İKON */}
+                    <div
+                      className={`
+                        relative
+                        z-10
+                        flex
+                        items-center
+                        justify-center
+                        w-7
+                        h-7
+                        transition-colors
+                        duration-200
+                        ${
+                          isActive
+                            ? 'text-[#3b82f6]'
+                            : 'text-[#9ca6b8]'
+                        }
+                      `}
+                    >
+                      <Icon
+                        className="w-[20px] h-[20px]"
+                        strokeWidth={
+                          isActive
+                            ? 2.5
+                            : 1.9
+                        }
+                      />
+                    </div>
 
+                    {/* YAZI */}
+                    <span
+                      className={`
+                        relative
+                        z-10
+                        text-[9px]
+                        font-semibold
+                        leading-none
+                        transition-colors
+                        duration-200
+                        ${
+                          isActive
+                            ? 'text-[#3b82f6]'
+                            : 'text-[#9ca6b8]'
+                        }
+                      `}
+                    >
+                      {item.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* TELEFON GÜVENLİ ALANI */}
+            <div
+              className="
+                h-[env(safe-area-inset-bottom)]
+                bg-[#11141d]
+              "
+            />
           </div>
-
-          {/* Telefon güvenli alanı */}
-          <div
-            className="
-              h-[env(safe-area-inset-bottom)]
-              bg-[var(--bg-card)]
-            "
-          />
-
         </div>
-      </div>
-    </nav>
+      </nav>
+
+      {/* ALT MENÜ İÇİN SAYFA BOŞLUĞU
+          İçeriğin barın altında kalmasını engeller */}
+      <div
+        className="
+          h-[92px]
+          sm:hidden
+          pointer-events-none
+        "
+        aria-hidden="true"
+      />
+    </>
   );
 }
