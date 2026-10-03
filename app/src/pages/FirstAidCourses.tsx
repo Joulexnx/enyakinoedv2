@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -21,22 +21,31 @@ import {
   ChevronDown,
   X,
   FileText,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
+
+const GOOGLE_SCRIPT_URL =
+  'https://script.google.com/macros/s/AKfycbxscVodtF7JY2-BV7ShWUQF2_2T_s9WwdSGfhriIRy4kE7DzE6M4_D5TQ-2Fo5AZTNyww/exec';
 
 type CourseCenter = {
   id: number;
   name: string;
+  representative: string;
   district: string;
   address: string;
   phone: string;
+  email: string;
+  website: string;
   description: string;
-  rating: number;
-  reviewCount: number;
   courses: string[];
   featured: boolean;
+  package: string;
+  showPhone: boolean;
+  showWebsite: boolean;
+  publishDate: string;
+  endDate: string;
 };
-
-const courseCenters: CourseCenter[] = [];
 
 const districts = [
   'Tüm İlçeler',
@@ -72,17 +81,293 @@ const courseTypes = [
   },
 ];
 
+function parseBoolean(value: unknown): boolean {
+  if (typeof value === 'boolean') return value;
+
+  const text = String(value ?? '')
+    .trim()
+    .toLocaleLowerCase('tr-TR');
+
+  return ['evet', 'true', '1', 'yes', 'on', 'var'].includes(text);
+}
+
+function normalizeCourses(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => String(item).trim())
+      .filter(Boolean);
+  }
+
+  return String(value ?? '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function normalizePackage(value: unknown): string {
+  const packageName = String(value ?? '').trim();
+
+  if (!packageName) {
+    return 'Standart';
+  }
+
+  const normalized = packageName.toLocaleLowerCase('tr-TR');
+
+  if (normalized === 'premium') {
+    return 'Premium';
+  }
+
+  return packageName;
+}
+
+function getField(
+  item: Record<string, unknown>,
+  ...keys: string[]
+): string {
+  for (const key of keys) {
+    if (
+      item[key] !== undefined &&
+      item[key] !== null &&
+      String(item[key]).trim() !== ''
+    ) {
+      return String(item[key]).trim();
+    }
+  }
+
+  return '';
+}
+
+/**
+ * Apps Script tarafı zaten sadece Onaylandı kayıtları döndürüyor.
+ * Eğer API ayrıca Durum gönderirse onu da kontrol ediyoruz.
+ * Durum hiç yoksa kaydı elemeden devam ediyoruz.
+ */
+function isPublished(item: Record<string, unknown>): boolean {
+  const status = getField(
+    item,
+    'durum',
+    'Durum',
+    'Durum ',
+  )
+    .trim()
+    .toLocaleLowerCase('tr-TR');
+
+  // API normalize edilmiş kayıt gönderiyorsa Durum bulunmayabilir.
+  // Bu durumda Apps Script'in yaptığı filtrelemeye güveniyoruz.
+  if (
+    status &&
+    status !== 'onaylandı' &&
+    status !== 'onaylandi'
+  ) {
+    return false;
+  }
+
+  const now = new Date();
+
+  const publishDateText = getField(
+    item,
+    'yayın tarihi',
+    'Yayın Tarihi',
+    'yayin tarihi',
+    'Yayin Tarihi',
+  );
+
+  const endDateText = getField(
+    item,
+    'bitiş tarihi',
+    'Bitiş Tarihi',
+    'bitis tarihi',
+    'Bitis Tarihi',
+  );
+
+  if (publishDateText) {
+    const publishDate = new Date(publishDateText);
+
+    if (
+      !Number.isNaN(publishDate.getTime()) &&
+      now < publishDate
+    ) {
+      return false;
+    }
+  }
+
+  if (endDateText) {
+    const endDate = new Date(endDateText);
+
+    if (
+      !Number.isNaN(endDate.getTime()) &&
+      now > endDate
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function normalizeCenter(
+  item: Record<string, unknown>,
+  index: number,
+): CourseCenter {
+  return {
+    id: index + 1,
+
+    name: getField(
+      item,
+      'merkezAdı',
+      'merkezAdi',
+      'Kurs Merkezi',
+      'kurs merkezi',
+      'centerName',
+    ),
+
+    representative: getField(
+      item,
+      'temsilci',
+      'Yetkili',
+      'representative',
+    ),
+
+    district: getField(
+      item,
+      'ilçe',
+      'ilce',
+      'İlçe',
+      'district',
+    ),
+
+    address: getField(
+      item,
+      'adres',
+      'Açık Adres',
+      'açık adres',
+      'address',
+    ),
+
+    phone: getField(
+      item,
+      'telefon',
+      'Telefon',
+      'phone',
+    ),
+
+    email: getField(
+      item,
+      'e-posta',
+      'eposta',
+      'E-posta',
+      'Eposta',
+      'email',
+    ),
+
+    website: getField(
+      item,
+      'web sitesi',
+      'webSitesi',
+      'Web Sitesi',
+      'website',
+    ),
+
+    description: getField(
+      item,
+      'açıklama',
+      'aciklama',
+      'Açıklama',
+      'description',
+    ),
+
+    courses: normalizeCourses(
+      item['kurslar'] ??
+        item['Eğitimler'] ??
+        item['egitimler'] ??
+        item['courses'],
+    ),
+
+    featured: parseBoolean(
+      item['öne çıkan'] ??
+        item['one cikan'] ??
+        item['Öne Çıkan'] ??
+        item['featured'],
+    ),
+
+    package: normalizePackage(
+      getField(
+        item,
+        'paket',
+        'Paket',
+        'package',
+      ),
+    ),
+
+    showPhone: parseBoolean(
+      item['telefon göster'] ??
+        item['Telefon Göster'] ??
+        item['telefonGoster'] ??
+        item['showPhone'],
+    ),
+
+    showWebsite: parseBoolean(
+      item['web sitesi göster'] ??
+        item['Web Sitesi Göster'] ??
+        item['webSitesiGoster'] ??
+        item['showWebsite'],
+    ),
+
+    publishDate: getField(
+      item,
+      'yayın tarihi',
+      'Yayın Tarihi',
+      'yayin tarihi',
+      'Yayin Tarihi',
+      'publishDate',
+    ),
+
+    endDate: getField(
+      item,
+      'bitiş tarihi',
+      'Bitiş Tarihi',
+      'bitis tarihi',
+      'Bitis Tarihi',
+      'endDate',
+    ),
+  };
+}
+
 function CourseCenterCard({
   center,
 }: {
   center: CourseCenter;
 }) {
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    `${center.address}, ${center.district}, Ankara`,
+  )}`;
+
+  const isPremium =
+    center.package.toLocaleLowerCase('tr-TR') === 'premium';
+
   return (
-    <article className="group relative overflow-hidden rounded-3xl border border-[var(--border-subtle)] bg-white dark:bg-[var(--bg-card)] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-      {center.featured && (
-        <div className="absolute top-4 right-4 z-10 inline-flex items-center gap-1.5 rounded-full bg-[var(--accent-blue)] px-3 py-1.5 text-[11px] font-semibold text-white shadow-md">
-          <Star className="w-3.5 h-3.5 fill-current" />
-          Öne Çıkan
+    <article
+      className={`group relative overflow-hidden rounded-3xl bg-white dark:bg-[var(--bg-card)] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
+        isPremium
+          ? 'border border-[rgba(23,106,246,0.45)] ring-1 ring-[rgba(23,106,246,0.08)]'
+          : 'border border-[var(--border-subtle)]'
+      }`}
+    >
+      {(center.featured || isPremium) && (
+        <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-1.5">
+          {center.featured && (
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-[var(--accent-blue)] px-3 py-1.5 text-[11px] font-semibold text-white shadow-md">
+              <Star className="w-3.5 h-3.5 fill-current" />
+              Öne Çıkan
+            </div>
+          )}
+
+          {isPremium && (
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-slate-900 dark:bg-white px-3 py-1.5 text-[11px] font-semibold text-white dark:text-slate-900 shadow-md">
+              <Star className="w-3.5 h-3.5 fill-current" />
+              Premium
+            </div>
+          )}
         </div>
       )}
 
@@ -92,70 +377,108 @@ function CourseCenterCard({
             <Building2 className="w-6 h-6" />
           </div>
 
-          <div className="min-w-0">
+          <div className="min-w-0 pr-16">
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white leading-snug">
-              {center.name}
+              {center.name || 'Eğitim Merkezi'}
             </h3>
 
             <div className="mt-2 flex items-center gap-1.5 text-sm text-[var(--text-secondary)]">
               <MapPin className="w-4 h-4 flex-shrink-0" />
-              <span>{center.district}, Ankara</span>
+              <span>
+                {center.district
+                  ? `${center.district}, Ankara`
+                  : 'Ankara'}
+              </span>
             </div>
           </div>
         </div>
 
-        <div className="mt-5 flex items-center gap-2">
-          <div className="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 dark:bg-amber-500/10 px-2.5 py-1.5 text-sm font-semibold text-amber-600 dark:text-amber-400">
-            <Star className="w-4 h-4 fill-current" />
-            {center.rating}
+        {isPremium && (
+          <div className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-[rgba(23,106,246,0.08)] px-2.5 py-1.5 text-xs font-semibold text-[var(--accent-blue)]">
+            <Star className="w-3.5 h-3.5 fill-current" />
+            Premium paket
           </div>
+        )}
 
-          <span className="text-xs text-[var(--text-secondary)]">
-            ({center.reviewCount} değerlendirme)
-          </span>
-        </div>
+        {center.description && (
+          <p className="mt-4 text-sm text-[var(--text-secondary)] leading-relaxed">
+            {center.description}
+          </p>
+        )}
 
-        <p className="mt-4 text-sm text-[var(--text-secondary)] leading-relaxed">
-          {center.description}
-        </p>
+        {center.courses.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {center.courses.map((course) => (
+              <span
+                key={course}
+                className="rounded-lg bg-[var(--bg-primary)] border border-[var(--border-subtle)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)]"
+              >
+                {course}
+              </span>
+            ))}
+          </div>
+        )}
 
-        <div className="mt-4 flex flex-wrap gap-2">
-          {center.courses.map((course) => (
-            <span
-              key={course}
-              className="rounded-lg bg-[var(--bg-primary)] border border-[var(--border-subtle)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)]"
+        <div className="mt-5 pt-5 border-t border-[var(--border-subtle)] space-y-2">
+          {center.address && (
+            <div className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
+              <MapPin className="w-4 h-4 mt-0.5 text-[var(--accent-blue)] flex-shrink-0" />
+              <span>{center.address}</span>
+            </div>
+          )}
+
+          {center.showPhone && center.phone && (
+            <a
+              href={`tel:${center.phone}`}
+              className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--accent-blue)] transition-colors"
             >
-              {course}
-            </span>
-          ))}
-        </div>
+              <Phone className="w-4 h-4 text-[var(--accent-blue)]" />
+              <span>{center.phone}</span>
+            </a>
+          )}
 
-        <div className="mt-5 pt-5 border-t border-[var(--border-subtle)]">
-          <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
-            <MapPin className="w-4 h-4 text-[var(--accent-blue)]" />
-            <span className="truncate">{center.address}</span>
-          </div>
-
-          <div className="mt-2 flex items-center gap-2 text-sm text-[var(--text-secondary)]">
-            <Phone className="w-4 h-4 text-[var(--accent-blue)]" />
-            <span>{center.phone}</span>
-          </div>
+          {center.email && (
+            <a
+              href={`mailto:${center.email}`}
+              className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--accent-blue)] transition-colors"
+            >
+              <Mail className="w-4 h-4 text-[var(--accent-blue)]" />
+              <span className="truncate">{center.email}</span>
+            </a>
+          )}
         </div>
 
         <div className="mt-6 grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            className="h-11 rounded-xl bg-[var(--accent-blue)] text-white text-sm font-semibold hover:brightness-95 transition-all"
+          <a
+            href={mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-[var(--accent-blue)] text-white text-sm font-semibold hover:brightness-95 transition-all"
           >
-            Detayları Gör
-          </button>
-
-          <button
-            type="button"
-            className="h-11 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-slate-900 dark:text-white text-sm font-semibold hover:border-[var(--accent-blue)] hover:text-[var(--accent-blue)] transition-all"
-          >
+            <MapPin className="w-4 h-4" />
             Yol Tarifi
-          </button>
+          </a>
+
+          {center.showWebsite && center.website ? (
+            <a
+              href={
+                center.website.startsWith('http')
+                  ? center.website
+                  : `https://${center.website}`
+              }
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 h-11 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-slate-900 dark:text-white text-sm font-semibold hover:border-[var(--accent-blue)] hover:text-[var(--accent-blue)] transition-all"
+            >
+              <Globe className="w-4 h-4" />
+              Web Sitesi
+            </a>
+          ) : (
+            <div className="inline-flex items-center justify-center gap-2 h-11 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-[var(--text-secondary)] text-sm font-medium">
+              <ShieldCheck className="w-4 h-4" />
+              Onaylı Merkez
+            </div>
+          )}
         </div>
       </div>
     </article>
@@ -166,13 +489,15 @@ function FieldLabel({
   children,
   required = false,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   required?: boolean;
 }) {
   return (
     <label className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
       {children}
-      {required && <span className="text-red-500 ml-1">*</span>}
+      {required && (
+        <span className="text-red-500 ml-1">*</span>
+      )}
     </label>
   );
 }
@@ -186,7 +511,7 @@ function InputField({
   type = 'text',
   required = false,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   label: string;
   placeholder: string;
   value: string;
@@ -196,7 +521,9 @@ function InputField({
 }) {
   return (
     <div>
-      <FieldLabel required={required}>{label}</FieldLabel>
+      <FieldLabel required={required}>
+        {label}
+      </FieldLabel>
 
       <div className="relative">
         <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]">
@@ -206,7 +533,9 @@ function InputField({
         <input
           type={type}
           value={value}
-          onChange={(event) => onChange(event.target.value)}
+          onChange={(event) =>
+            onChange(event.target.value)
+          }
           placeholder={placeholder}
           className="w-full h-12 pl-11 pr-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-slate-900 dark:text-white placeholder:text-[var(--text-secondary)] outline-none focus:border-[var(--accent-blue)] focus:ring-2 focus:ring-[rgba(23,106,246,0.12)] transition-all"
         />
@@ -236,19 +565,20 @@ function ListingApplicationModal({
     kvkk: false,
   });
 
-  const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
+  const [selectedCourses, setSelectedCourses] =
+    useState<string[]>([]);
 
   const toggleCourse = (course: string) => {
     setSelectedCourses((current) =>
       current.includes(course)
         ? current.filter((item) => item !== course)
-        : [...current, course]
+        : [...current, course],
     );
   };
 
   const updateField = (
     field: keyof typeof form,
-    value: string | boolean
+    value: string | boolean,
   ) => {
     setForm((current) => ({
       ...current,
@@ -257,7 +587,7 @@ function ListingApplicationModal({
   };
 
   const handleSubmit = async (
-    event: React.FormEvent
+    event: React.FormEvent,
   ) => {
     event.preventDefault();
 
@@ -274,7 +604,7 @@ function ListingApplicationModal({
       !form.kvkk
     ) {
       setError(
-        'Lütfen zorunlu alanların tamamını doldurun ve onay kutusunu işaretleyin.'
+        'Lütfen zorunlu alanların tamamını doldurun ve onay kutusunu işaretleyin.',
       );
       return;
     }
@@ -282,9 +612,6 @@ function ListingApplicationModal({
     setSubmitting(true);
 
     try {
-      const GOOGLE_SCRIPT_URL =
-        'https://script.google.com/macros/s/AKfycbwlqLqvv3skmRkrrorY1poncnQHEThiSEq0kC8oSMaKyeNGxKtdxPjdjYp7fUXKJjCUOw/exec';
-
       const payload = {
         centerName: form.centerName.trim(),
         representative: form.representative.trim(),
@@ -303,22 +630,27 @@ function ListingApplicationModal({
         {
           method: 'POST',
           headers: {
-            'Content-Type': 'text/plain;charset=utf-8',
+            'Content-Type':
+              'text/plain;charset=utf-8',
           },
           body: JSON.stringify(payload),
-        }
+        },
       );
 
       if (!response.ok) {
         throw new Error(
-          'Başvuru gönderilemedi.'
+          'Başvuru gönderilemedi.',
         );
       }
 
-      let result: {
-        success?: boolean;
-        message?: string;
-      } | null = null;
+      let result:
+        | {
+            success?: boolean;
+            başarılı?: boolean;
+            message?: string;
+            mesaj?: string;
+          }
+        | null = null;
 
       try {
         result = await response.json();
@@ -327,12 +659,13 @@ function ListingApplicationModal({
       }
 
       if (
-        result &&
-        result.success === false
+        result?.success === false ||
+        result?.başarılı === false
       ) {
         throw new Error(
           result.message ||
-            'Başvuru kaydedilemedi.'
+            result.mesaj ||
+            'Başvuru kaydedilemedi.',
         );
       }
 
@@ -340,11 +673,11 @@ function ListingApplicationModal({
     } catch (submitError) {
       console.error(
         'Kurs başvuru gönderim hatası:',
-        submitError
+        submitError,
       );
 
       setError(
-        'Başvuru gönderilirken bir sorun oluştu. Lütfen tekrar deneyin.'
+        'Başvuru gönderilirken bir sorun oluştu. Lütfen tekrar deneyin.',
       );
     } finally {
       setSubmitting(false);
@@ -360,11 +693,13 @@ function ListingApplicationModal({
     >
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={submitting ? undefined : onClose}
+        onClick={
+          submitting ? undefined : onClose
+        }
       />
 
       <div className="relative w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-3xl bg-white dark:bg-[var(--bg-card)] shadow-2xl border border-[var(--border-subtle)] text-slate-900 dark:text-white">
-        <div className="sticky top-0 z-10 flex items-center justify-between gap-4 px-5 sm:px-7 py-4 border-b border-[var(--border-subtle)] bg-white dark:bg-[var(--bg-card)] backdrop-blur-xl">
+        <div className="sticky top-0 z-10 flex items-center justify-between gap-4 px-5 sm:px-7 py-4 border-b border-[var(--border-subtle)] bg-white dark:bg-[var(--bg-card)]">
           <div>
             <div className="flex items-center gap-2 text-[var(--accent-blue)] text-xs font-semibold">
               <Building2 className="w-4 h-4" />
@@ -383,7 +718,7 @@ function ListingApplicationModal({
             type="button"
             onClick={onClose}
             disabled={submitting}
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-colors disabled:opacity-40"
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors disabled:opacity-40"
             aria-label="Kapat"
           >
             <X className="w-5 h-5" />
@@ -401,9 +736,10 @@ function ListingApplicationModal({
             </h3>
 
             <p className="mt-3 max-w-md mx-auto text-sm text-[var(--text-secondary)] leading-relaxed">
-              Eğitim merkezi bilgileriniz başvuru sistemimize
-              kaydedildi. Başvurunuz incelendikten sonra
-              yayınlama süreci için sizinle iletişime geçilebilir.
+              Eğitim merkezi bilgileriniz başvuru
+              sistemimize kaydedildi. Başvurunuz
+              incelendikten sonra yayınlama süreci
+              için sizinle iletişime geçilebilir.
             </p>
 
             <button
@@ -423,13 +759,16 @@ function ListingApplicationModal({
 
                   <div>
                     <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                      Platformda yer almak için başvurun
+                      Platformda yer almak için
+                      başvurun
                     </p>
 
                     <p className="mt-1 text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                      Merkezinizin bilgilerini doldurun. Başvurunuz
-                      değerlendirildikten sonra yayınlama ve paket seçenekleri
-                      hakkında sizinle iletişime geçilebilir.
+                      Merkezinizin bilgilerini doldurun.
+                      Başvurunuz değerlendirildikten
+                      sonra yayınlama ve paket
+                      seçenekleri hakkında sizinle
+                      iletişime geçilebilir.
                     </p>
                   </div>
                 </div>
@@ -438,7 +777,6 @@ function ListingApplicationModal({
               <section>
                 <div className="flex items-center gap-2 mb-4">
                   <Building2 className="w-5 h-5 text-[var(--accent-blue)]" />
-
                   <h3 className="font-semibold text-slate-900 dark:text-white">
                     Eğitim Merkezi Bilgileri
                   </h3>
@@ -446,46 +784,66 @@ function ListingApplicationModal({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <InputField
-                    icon={<Building2 className="w-4 h-4" />}
+                    icon={
+                      <Building2 className="w-4 h-4" />
+                    }
                     label="Kurs / Eğitim Merkezi Adı"
                     placeholder="Örn. ABC İlk Yardım Eğitim Merkezi"
                     value={form.centerName}
                     onChange={(value) =>
-                      updateField('centerName', value)
+                      updateField(
+                        'centerName',
+                        value,
+                      )
                     }
                     required
                   />
 
                   <InputField
-                    icon={<UserRound className="w-4 h-4" />}
+                    icon={
+                      <UserRound className="w-4 h-4" />
+                    }
                     label="Yetkili Ad Soyad"
                     placeholder="Ad Soyad"
                     value={form.representative}
                     onChange={(value) =>
-                      updateField('representative', value)
+                      updateField(
+                        'representative',
+                        value,
+                      )
                     }
                     required
                   />
 
                   <InputField
-                    icon={<Phone className="w-4 h-4" />}
+                    icon={
+                      <Phone className="w-4 h-4" />
+                    }
                     label="Telefon"
                     placeholder="05XX XXX XX XX"
                     value={form.phone}
                     onChange={(value) =>
-                      updateField('phone', value)
+                      updateField(
+                        'phone',
+                        value,
+                      )
                     }
                     type="tel"
                     required
                   />
 
                   <InputField
-                    icon={<Mail className="w-4 h-4" />}
+                    icon={
+                      <Mail className="w-4 h-4" />
+                    }
                     label="E-posta"
                     placeholder="ornek@firma.com"
                     value={form.email}
                     onChange={(value) =>
-                      updateField('email', value)
+                      updateField(
+                        'email',
+                        value,
+                      )
                     }
                     type="email"
                     required
@@ -496,7 +854,6 @@ function ListingApplicationModal({
               <section>
                 <div className="flex items-center gap-2 mb-4">
                   <MapPin className="w-5 h-5 text-[var(--accent-blue)]" />
-
                   <h3 className="font-semibold text-slate-900 dark:text-white">
                     Konum ve İletişim
                   </h3>
@@ -514,10 +871,10 @@ function ListingApplicationModal({
                         onChange={(event) =>
                           updateField(
                             'district',
-                            event.target.value
+                            event.target.value,
                           )
                         }
-                        className="appearance-none w-full h-12 px-4 pr-10 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-slate-900 dark:text-white outline-none focus:border-[var(--accent-blue)] focus:ring-2 focus:ring-[rgba(23,106,246,0.12)] transition-all cursor-pointer"
+                        className="appearance-none w-full h-12 px-4 pr-10 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-slate-900 dark:text-white outline-none focus:border-[var(--accent-blue)] transition-all cursor-pointer"
                         required
                       >
                         <option
@@ -531,7 +888,7 @@ function ListingApplicationModal({
                           .filter(
                             (district) =>
                               district !==
-                              'Tüm İlçeler'
+                              'Tüm İlçeler',
                           )
                           .map((district) => (
                             <option
@@ -558,23 +915,28 @@ function ListingApplicationModal({
                       onChange={(event) =>
                         updateField(
                           'address',
-                          event.target.value
+                          event.target.value,
                         )
                       }
                       placeholder="Eğitim merkezinizin açık adresini yazın."
                       rows={3}
-                      className="w-full px-4 py-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-slate-900 dark:text-white placeholder:text-[var(--text-secondary)] outline-none resize-none focus:border-[var(--accent-blue)] focus:ring-2 focus:ring-[rgba(23,106,246,0.12)] transition-all"
+                      className="w-full px-4 py-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-slate-900 dark:text-white placeholder:text-[var(--text-secondary)] outline-none resize-none focus:border-[var(--accent-blue)] transition-all"
                       required
                     />
                   </div>
 
                   <InputField
-                    icon={<Globe className="w-4 h-4" />}
+                    icon={
+                      <Globe className="w-4 h-4" />
+                    }
                     label="Web Sitesi"
                     placeholder="https://www.ornek.com"
                     value={form.website}
                     onChange={(value) =>
-                      updateField('website', value)
+                      updateField(
+                        'website',
+                        value,
+                      )
                     }
                     type="url"
                   />
@@ -587,7 +949,9 @@ function ListingApplicationModal({
 
                   <h3 className="font-semibold text-slate-900 dark:text-white">
                     Verdiğiniz Eğitimler
-                    <span className="text-red-500 ml-1">*</span>
+                    <span className="text-red-500 ml-1">
+                      *
+                    </span>
                   </h3>
                 </div>
 
@@ -598,7 +962,9 @@ function ListingApplicationModal({
                     'Kurumsal Eğitim',
                   ].map((course) => {
                     const selected =
-                      selectedCourses.includes(course);
+                      selectedCourses.includes(
+                        course,
+                      );
 
                     return (
                       <button
@@ -648,12 +1014,12 @@ function ListingApplicationModal({
                   onChange={(event) =>
                     updateField(
                       'description',
-                      event.target.value
+                      event.target.value,
                     )
                   }
                   placeholder="Eğitim merkeziniz ve sunduğunuz hizmetler hakkında kısa bilgi verebilirsiniz."
                   rows={4}
-                  className="w-full px-4 py-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-slate-900 dark:text-white placeholder:text-[var(--text-secondary)] outline-none resize-none focus:border-[var(--accent-blue)] focus:ring-2 focus:ring-[rgba(23,106,246,0.12)] transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-slate-900 dark:text-white placeholder:text-[var(--text-secondary)] outline-none resize-none focus:border-[var(--accent-blue)] transition-all"
                 />
               </section>
 
@@ -664,7 +1030,7 @@ function ListingApplicationModal({
                   onChange={(event) =>
                     updateField(
                       'kvkk',
-                      event.target.checked
+                      event.target.checked,
                     )
                   }
                   className="mt-1 w-4 h-4 accent-[var(--accent-blue)]"
@@ -672,22 +1038,29 @@ function ListingApplicationModal({
                 />
 
                 <span className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                  Paylaştığım bilgilerin eğitim merkezi başvurusu
-                  kapsamında değerlendirilmesini kabul ediyorum.
-                  <span className="text-red-500 ml-1">*</span>
+                  Paylaştığım bilgilerin eğitim
+                  merkezi başvurusu kapsamında
+                  değerlendirilmesini kabul ediyorum.
+                  <span className="text-red-500 ml-1">
+                    *
+                  </span>
                 </span>
               </label>
 
               {error && (
                 <div className="rounded-xl border border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-red-500/10 px-4 py-3">
-                  <p className="text-sm text-red-600 dark:text-red-400">
-                    {error}
-                  </p>
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-500 mt-0.5" />
+
+                    <p className="text-sm text-red-600 dark:text-red-400">
+                      {error}
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
 
-            <div className="sticky bottom-0 border-t border-[var(--border-subtle)] bg-white dark:bg-[var(--bg-card)] backdrop-blur-xl px-5 sm:px-7 py-4">
+            <div className="sticky bottom-0 border-t border-[var(--border-subtle)] bg-white dark:bg-[var(--bg-card)] px-5 sm:px-7 py-4">
               <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
                 <p className="text-xs text-[var(--text-secondary)]">
                   <span className="text-red-500">*</span>{' '}
@@ -711,7 +1084,7 @@ function ListingApplicationModal({
                   >
                     {submitting ? (
                       <>
-                        <span className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+                        <Loader2 className="w-4 h-4 animate-spin" />
                         Gönderiliyor...
                       </>
                     ) : (
@@ -732,35 +1105,189 @@ function ListingApplicationModal({
 }
 
 export default function FirstAidCourses() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] =
+    useState('');
+
   const [selectedDistrict, setSelectedDistrict] =
     useState('Tüm İlçeler');
 
   const [isApplicationOpen, setIsApplicationOpen] =
     useState(false);
 
+  const [courseCenters, setCourseCenters] =
+    useState<CourseCenter[]>([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [loadError, setLoadError] =
+    useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadCourses = async () => {
+      setLoading(true);
+      setLoadError('');
+
+      try {
+        const response = await fetch(
+          GOOGLE_SCRIPT_URL,
+          {
+            method: 'GET',
+            cache: 'no-store',
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `Sunucu ${response.status} hatası`,
+          );
+        }
+
+        const data = await response.json();
+
+        const apiSuccess =
+          data?.başarılı ??
+          data?.basarili ??
+          data?.success ??
+          true;
+
+        if (apiSuccess === false) {
+          throw new Error(
+            data?.mesaj ||
+              data?.message ||
+              data?.error ||
+              'Kurs verileri alınamadı.',
+          );
+        }
+
+        const rawCourses = Array.isArray(
+          data?.kurslar,
+        )
+          ? data.kurslar
+          : Array.isArray(data?.courses)
+            ? data.courses
+            : [];
+
+        console.log(
+          'Google Sheets kurs verileri:',
+          rawCourses,
+        );
+
+        const visibleCourses = rawCourses
+          .filter(
+            (item: Record<string, unknown>) =>
+              isPublished(item),
+          )
+          .map(
+            (
+              item: Record<string, unknown>,
+              index: number,
+            ) => normalizeCenter(item, index),
+          )
+          .filter((center) => center.name.trim() !== '')
+          .sort((a, b) => {
+            if (a.featured !== b.featured) {
+              return a.featured ? -1 : 1;
+            }
+
+            const aPremium =
+              a.package.toLocaleLowerCase('tr-TR') ===
+              'premium';
+
+            const bPremium =
+              b.package.toLocaleLowerCase('tr-TR') ===
+              'premium';
+
+            if (aPremium !== bPremium) {
+              return aPremium ? -1 : 1;
+            }
+
+            return a.name.localeCompare(
+              b.name,
+              'tr-TR',
+            );
+          });
+
+        if (!cancelled) {
+          setCourseCenters(
+            visibleCourses,
+          );
+        }
+      } catch (error) {
+        console.error(
+          'Eğitim merkezleri alınamadı:',
+          error,
+        );
+
+        if (!cancelled) {
+          setLoadError(
+            'Eğitim merkezleri şu anda yüklenemiyor. Lütfen daha sonra tekrar deneyin.',
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadCourses();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const filteredCenters = useMemo(() => {
-    const normalizedSearch = searchTerm
-      .toLocaleLowerCase('tr-TR')
-      .trim();
+    const normalizedSearch =
+      searchTerm
+        .toLocaleLowerCase('tr-TR')
+        .trim();
 
-    return courseCenters.filter((center) => {
-      const matchesSearch =
-        !normalizedSearch ||
-        center.name
-          .toLocaleLowerCase('tr-TR')
-          .includes(normalizedSearch) ||
-        center.district
-          .toLocaleLowerCase('tr-TR')
-          .includes(normalizedSearch);
+    return courseCenters.filter(
+      (center) => {
+        const matchesSearch =
+          !normalizedSearch ||
+          center.name
+            .toLocaleLowerCase('tr-TR')
+            .includes(
+              normalizedSearch,
+            ) ||
+          center.district
+            .toLocaleLowerCase('tr-TR')
+            .includes(
+              normalizedSearch,
+            ) ||
+          center.courses.some(
+            (course) =>
+              course
+                .toLocaleLowerCase(
+                  'tr-TR',
+                )
+                .includes(
+                  normalizedSearch,
+                ),
+          );
 
-      const matchesDistrict =
-        selectedDistrict === 'Tüm İlçeler' ||
-        center.district === selectedDistrict;
+        const matchesDistrict =
+          selectedDistrict ===
+            'Tüm İlçeler' ||
+          center.district ===
+            selectedDistrict;
 
-      return matchesSearch && matchesDistrict;
-    });
-  }, [searchTerm, selectedDistrict]);
+        return (
+          matchesSearch &&
+          matchesDistrict
+        );
+      },
+    );
+  }, [
+    courseCenters,
+    searchTerm,
+    selectedDistrict,
+  ]);
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-slate-900 dark:text-white">
@@ -813,8 +1340,9 @@ export default function FirstAidCourses() {
               </h1>
 
               <p className="mt-5 text-sm sm:text-lg text-[var(--text-secondary)] leading-relaxed max-w-2xl mx-auto">
-                İlk yardım eğitimi almak isteyenler için platformumuzda yer
-                alan eğitim merkezlerini keşfedin.
+                İlk yardım eğitimi almak isteyenler
+                için platformumuzda yer alan eğitim
+                merkezlerini keşfedin.
               </p>
 
               <div className="mt-8 max-w-3xl mx-auto">
@@ -826,7 +1354,9 @@ export default function FirstAidCourses() {
                       type="text"
                       value={searchTerm}
                       onChange={(event) =>
-                        setSearchTerm(event.target.value)
+                        setSearchTerm(
+                          event.target.value,
+                        )
                       }
                       placeholder="Kurs merkezi veya ilçe ara..."
                       className="w-full h-14 pl-12 pr-4 rounded-2xl border border-[var(--border-subtle)] bg-white dark:bg-[var(--bg-card)] text-sm sm:text-base text-slate-900 dark:text-white placeholder:text-[var(--text-secondary)] outline-none focus:ring-2 focus:ring-[rgba(23,106,246,0.2)] focus:border-[var(--accent-blue)] transition-all shadow-sm"
@@ -837,19 +1367,23 @@ export default function FirstAidCourses() {
                     <select
                       value={selectedDistrict}
                       onChange={(event) =>
-                        setSelectedDistrict(event.target.value)
+                        setSelectedDistrict(
+                          event.target.value,
+                        )
                       }
                       className="appearance-none w-full h-14 px-4 pr-10 rounded-2xl border border-[var(--border-subtle)] bg-white dark:bg-[var(--bg-card)] text-sm text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-[rgba(23,106,246,0.2)] focus:border-[var(--accent-blue)] transition-all shadow-sm cursor-pointer"
                     >
-                      {districts.map((district) => (
-                        <option
-                          key={district}
-                          value={district}
-                          className="text-slate-900"
-                        >
-                          {district}
-                        </option>
-                      ))}
+                      {districts.map(
+                        (district) => (
+                          <option
+                            key={district}
+                            value={district}
+                            className="text-slate-900"
+                          >
+                            {district}
+                          </option>
+                        ),
+                      )}
                     </select>
 
                     <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
@@ -860,7 +1394,7 @@ export default function FirstAidCourses() {
               <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-xs sm:text-sm text-[var(--text-secondary)]">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  Seçili eğitim merkezleri
+                  Onaylı eğitim merkezleri
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -885,8 +1419,9 @@ export default function FirstAidCourses() {
               </h2>
 
               <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                İhtiyacınıza uygun ilk yardım eğitimi için listelenen
-                merkezleri inceleyin.
+                İhtiyacınıza uygun ilk yardım
+                eğitimi için listelenen merkezleri
+                inceleyin.
               </p>
             </div>
 
@@ -927,7 +1462,7 @@ export default function FirstAidCourses() {
                     Eğitim Merkezleri
                   </h2>
 
-                  {courseCenters.length > 0 && (
+                  {!loading && (
                     <span className="rounded-full bg-[rgba(23,106,246,0.08)] text-[var(--accent-blue)] px-2.5 py-1 text-xs font-semibold">
                       {filteredCenters.length}
                     </span>
@@ -935,8 +1470,8 @@ export default function FirstAidCourses() {
                 </div>
 
                 <p className="mt-1.5 text-sm text-[var(--text-secondary)]">
-                  Platformumuzda yer alan ilk yardım eğitim merkezlerini
-                  inceleyin.
+                  Platformumuzda yer alan onaylı ilk
+                  yardım eğitim merkezlerini inceleyin.
                 </p>
               </div>
 
@@ -946,14 +1481,52 @@ export default function FirstAidCourses() {
               </div>
             </div>
 
-            {filteredCenters.length > 0 ? (
+            {loading ? (
+              <div className="rounded-3xl border border-[var(--border-subtle)] bg-white dark:bg-[var(--bg-card)] p-12 text-center shadow-sm">
+                <Loader2 className="w-9 h-9 mx-auto text-[var(--accent-blue)] animate-spin" />
+
+                <h3 className="mt-5 text-lg font-semibold text-slate-900 dark:text-white">
+                  Eğitim merkezleri yükleniyor
+                </h3>
+
+                <p className="mt-2 text-sm text-[var(--text-secondary)]">
+                  Güncel liste hazırlanıyor...
+                </p>
+              </div>
+            ) : loadError ? (
+              <div className="rounded-3xl border border-red-200 dark:border-red-500/20 bg-white dark:bg-[var(--bg-card)] p-8 sm:p-12 text-center shadow-sm">
+                <div className="w-14 h-14 mx-auto rounded-2xl bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center">
+                  <AlertCircle className="w-7 h-7" />
+                </div>
+
+                <h3 className="mt-5 text-lg font-semibold text-slate-900 dark:text-white">
+                  Liste yüklenemedi
+                </h3>
+
+                <p className="mt-2 max-w-md mx-auto text-sm text-[var(--text-secondary)]">
+                  {loadError}
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    window.location.reload()
+                  }
+                  className="mt-6 h-11 px-5 rounded-xl bg-[var(--accent-blue)] text-white text-sm font-semibold"
+                >
+                  Tekrar Dene
+                </button>
+              </div>
+            ) : filteredCenters.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {filteredCenters.map((center) => (
-                  <CourseCenterCard
-                    key={center.id}
-                    center={center}
-                  />
-                ))}
+                {filteredCenters.map(
+                  (center) => (
+                    <CourseCenterCard
+                      key={center.id}
+                      center={center}
+                    />
+                  ),
+                )}
               </div>
             ) : (
               <div className="rounded-3xl border border-[var(--border-subtle)] bg-white dark:bg-[var(--bg-card)] overflow-hidden shadow-sm">
@@ -963,32 +1536,39 @@ export default function FirstAidCourses() {
                   </div>
 
                   <h3 className="mt-6 text-xl font-semibold text-slate-900 dark:text-white">
-                    Henüz listelenen eğitim merkezi yok
+                    {courseCenters.length > 0
+                      ? 'Aramanıza uygun merkez bulunamadı'
+                      : 'Henüz listelenen eğitim merkezi yok'}
                   </h3>
 
                   <p className="mt-3 max-w-xl mx-auto text-sm text-[var(--text-secondary)] leading-relaxed">
-                    En Yakın OED platformunda yer almak isteyen ilk yardım
-                    eğitim merkezleri başvuru yaparak işletme bilgilerini
-                    yayınlatabilir.
+                    {courseCenters.length > 0
+                      ? 'Arama veya ilçe filtresini değiştirerek tekrar deneyebilirsiniz.'
+                      : 'En Yakın OED platformunda yer almak isteyen ilk yardım eğitim merkezleri başvuru yaparak işletme bilgilerini yayınlatabilir.'}
                   </p>
 
-                  <div className="mt-7 flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setIsApplicationOpen(true)
-                      }
-                      className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-xl bg-[var(--accent-blue)] text-white text-sm font-semibold hover:brightness-95 transition-all shadow-sm"
-                    >
-                      Eğitim Merkezimi Listele
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
+                  {courseCenters.length ===
+                    0 && (
+                    <div className="mt-7 flex flex-col sm:flex-row items-center justify-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setIsApplicationOpen(
+                            true,
+                          )
+                        }
+                        className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-xl bg-[var(--accent-blue)] text-white text-sm font-semibold hover:brightness-95 transition-all shadow-sm"
+                      >
+                        Eğitim Merkezimi Listele
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
 
-                    <div className="inline-flex items-center gap-2 text-xs text-[var(--text-secondary)]">
-                      <Clock3 className="w-4 h-4" />
-                      Başvurular değerlendirilmektedir
+                      <div className="inline-flex items-center gap-2 text-xs text-[var(--text-secondary)]">
+                        <Clock3 className="w-4 h-4" />
+                        Başvurular değerlendirilmektedir
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             )}
@@ -1016,10 +1596,13 @@ export default function FirstAidCourses() {
                     </h2>
 
                     <p className="mt-4 max-w-2xl text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
-                      Eğitim merkezinizi Ankara'da ilk yardım eğitimi arayan
-                      kullanıcılara ulaştırın. Merkezinizin iletişim,
-                      konum ve eğitim bilgilerini platformda yayınlamak için
-                      başvuru oluşturabilirsiniz.
+                      Eğitim merkezinizi Ankara'da
+                      ilk yardım eğitimi arayan
+                      kullanıcılara ulaştırın.
+                      Merkezinizin iletişim, konum
+                      ve eğitim bilgilerini platformda
+                      yayınlamak için başvuru
+                      oluşturabilirsiniz.
                     </p>
 
                     <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -1043,7 +1626,9 @@ export default function FirstAidCourses() {
                   <button
                     type="button"
                     onClick={() =>
-                      setIsApplicationOpen(true)
+                      setIsApplicationOpen(
+                        true,
+                      )
                     }
                     className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-xl bg-[var(--accent-blue)] text-white text-sm font-semibold hover:brightness-95 transition-all shadow-sm whitespace-nowrap"
                   >
@@ -1067,10 +1652,13 @@ export default function FirstAidCourses() {
             </h2>
 
             <p className="mt-3 text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
-              Bu alan, ilk yardım eğitimi almak isteyen kullanıcılarla
-              platformda yer alan eğitim merkezlerini buluşturmak amacıyla
-              oluşturulmuştur. Listelenen merkezlerin iletişim ve eğitim
-              bilgileri kullanıcıların eğitim merkeziyle doğrudan iletişim
+              Bu alan, ilk yardım eğitimi almak
+              isteyen kullanıcılarla platformda yer
+              alan eğitim merkezlerini buluşturmak
+              amacıyla oluşturulmuştur. Listelenen
+              merkezlerin iletişim ve eğitim
+              bilgileri kullanıcıların eğitim
+              merkeziyle doğrudan iletişim
               kurabilmesine yardımcı olur.
             </p>
           </div>
@@ -1094,7 +1682,9 @@ export default function FirstAidCourses() {
 
       {isApplicationOpen && (
         <ListingApplicationModal
-          onClose={() => setIsApplicationOpen(false)}
+          onClose={() =>
+            setIsApplicationOpen(false)
+          }
         />
       )}
     </div>
