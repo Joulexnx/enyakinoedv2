@@ -1,4 +1,4 @@
-import { ThemeProvider } from '@/hooks/useTheme';
+﻿import { ThemeProvider } from '@/hooks/useTheme';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useVolunteerTracking } from '@/hooks/useVolunteerTracking';
 
@@ -15,7 +15,6 @@ import { Footer } from '@/sections/Footer';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import FirstAidCourses from '@/pages/FirstAidCourses';
 
-import { VolunteersPanel } from '@/components/VolunteersPanel';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
 
 function HomePage() {
@@ -52,10 +51,6 @@ function HomePage() {
           geolocationStatus={status}
           oedLocations={sortedOEDs}
           onRequestLocation={requestLocation}
-        />
-
-        <VolunteersPanel
-          userLocation={userLocation}
         />
 
         <NearbyOEDList
