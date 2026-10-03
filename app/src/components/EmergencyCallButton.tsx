@@ -266,7 +266,7 @@ export function EmergencyCallButton({
        * anahtarını güvenli şekilde kullanıyor.
        */
       const response = await fetch(
-        '/api/send-alert',
+  'https://enyakinoedv2.vercel.app/api/send-alert',
         {
           method: 'POST',
 
