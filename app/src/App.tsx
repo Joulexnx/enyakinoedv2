@@ -14,6 +14,7 @@ import { Footer } from '@/sections/Footer';
 
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import FirstAidCourses from '@/pages/FirstAidCourses';
+import CourseCenterManagement from '@/pages/CourseCenterManagement';
 
 import { MobileBottomNav } from '@/components/MobileBottomNav';
 
@@ -72,25 +73,34 @@ export default function App() {
   const path =
     window.location.pathname.replace(/\/+$/, '') || '/';
 
+  const isManagementPage =
+    path === '/kurs-merkezi-yonetim';
+
   return (
     <ThemeProvider>
 
       {path === '/gizlilik-politikasi' ? (
         <PrivacyPolicy />
+
       ) : path === '/ilk-yardim-kurslari' ? (
         <FirstAidCourses />
+
+      ) : isManagementPage ? (
+        <CourseCenterManagement />
+
       ) : (
         <HomePage />
       )}
 
-      {/* Mobil navigasyon tüm sayfalarda aktif */}
-      <MobileBottomNav
-        activeItem={
-          path === '/ilk-yardim-kurslari'
-            ? 'courses'
-            : 'home'
-        }
-      />
+      {!isManagementPage && (
+        <MobileBottomNav
+          activeItem={
+            path === '/ilk-yardim-kurslari'
+              ? 'courses'
+              : 'home'
+          }
+        />
+      )}
 
     </ThemeProvider>
   );
