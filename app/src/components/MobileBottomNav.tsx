@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 
 import {
   Home,
@@ -167,7 +167,7 @@ export function MobileBottomNav({
           left-0
           right-0
           bottom-0
-          z-[70]
+          z-[9999]
           sm:hidden
           pointer-events-none
         "
