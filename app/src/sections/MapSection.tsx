@@ -504,7 +504,7 @@ export function MapSection({
   return (
     <section
       id="oed-map"
-      className="pt-10 pb-[120px] sm:pb-16 px-4 sm:px-6 scroll-mt-24"
+      className="pt-10 pb-12 sm:pb-16 px-4 sm:px-6 scroll-mt-24"
     >
       <div className="max-w-[1200px] mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5">
@@ -592,7 +592,7 @@ export function MapSection({
             duration: 0.6,
             ease: [0.22, 1, 0.36, 1],
           }}
-          className="relative rounded-[22px] overflow-hidden border border-[var(--border)] bg-[#e8edf3] shadow-[0_18px_55px_rgba(15,23,42,0.10)]"
+                    className="relative rounded-[22px] overflow-hidden border border-[var(--border)] bg-[#e8edf3] shadow-[0_18px_55px_rgba(15,23,42,0.10)] h-[calc(clamp(390px,52vw,620px)-92px)] sm:h-[clamp(390px,52vw,620px)]"
           style={{
             height: 'clamp(390px, 52vw, 620px)',
           }}
@@ -615,7 +615,7 @@ export function MapSection({
                 }
                 scrollWheelZoom={true}
                 zoomControl={true}
-                className="w-full h-full pb-[92px] sm:pb-0"
+                className="w-full h-full"
                 style={{
                   height: '100%',
                   width: '100%',
@@ -846,6 +846,8 @@ export function MapSection({
     </section>
   );
 }
+
+
 
 
 
