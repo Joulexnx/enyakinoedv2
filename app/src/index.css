@@ -1,4 +1,4 @@
-/* Tailwind */
+﻿/* Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -122,11 +122,13 @@
 
   html {
     scroll-behavior: smooth;
+    overscroll-behavior-y: none;
   }
 
   body {
+    overscroll-behavior-y: none;
     @apply bg-[var(--bg-primary)] text-[var(--text-primary)] antialiased;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
   * {
@@ -302,3 +304,4 @@ html.dark .shimmer::after {
 .leaflet-popup-tip {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
 }
+
