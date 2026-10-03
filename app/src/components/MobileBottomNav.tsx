@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import {
   Home,
   Map,
@@ -46,8 +48,24 @@ const navItems = [
 export function MobileBottomNav({
   activeItem = 'home',
 }: MobileBottomNavProps) {
+
+  const [currentItem, setCurrentItem] =
+    useState(activeItem);
+
   const handleNavigation = (action: string) => {
+
+    /* ANA SAYFA */
     if (action === 'home') {
+      setCurrentItem('home');
+
+      if (
+        window.location.pathname !== '/' &&
+        window.location.pathname !== ''
+      ) {
+        window.location.href = '/';
+        return;
+      }
+
       window.scrollTo({
         top: 0,
         behavior: 'smooth',
@@ -56,7 +74,18 @@ export function MobileBottomNav({
       return;
     }
 
+    /* HARİTA */
     if (action === 'map') {
+      setCurrentItem('map');
+
+      if (
+        window.location.pathname !== '/' &&
+        window.location.pathname !== ''
+      ) {
+        window.location.href = '/#oed-map';
+        return;
+      }
+
       const section =
         document.getElementById('oed-map');
 
@@ -70,11 +99,20 @@ export function MobileBottomNav({
       return;
     }
 
+    /* CİHAZLAR */
     if (action === 'devices') {
+      setCurrentItem('devices');
+
+      if (
+        window.location.pathname !== '/' &&
+        window.location.pathname !== ''
+      ) {
+        window.location.href = '/#nearby-oed';
+        return;
+      }
+
       const section =
-        document.getElementById(
-          'nearby-oed'
-        );
+        document.getElementById('nearby-oed');
 
       if (section) {
         section.scrollIntoView({
@@ -86,11 +124,20 @@ export function MobileBottomNav({
       return;
     }
 
+    /* BİLGİ */
     if (action === 'info') {
+      setCurrentItem('info');
+
+      if (
+        window.location.pathname !== '/' &&
+        window.location.pathname !== ''
+      ) {
+        window.location.href = '/#information';
+        return;
+      }
+
       const section =
-        document.getElementById(
-          'information'
-        );
+        document.getElementById('information');
 
       if (section) {
         section.scrollIntoView({
@@ -102,9 +149,17 @@ export function MobileBottomNav({
       return;
     }
 
+    /* KURSLAR */
     if (action === 'courses') {
-      window.location.href =
-        '/ilk-yardim-kurslari';
+      setCurrentItem('courses');
+
+      if (
+        window.location.pathname !==
+        '/ilk-yardim-kurslari'
+      ) {
+        window.location.href =
+          '/ilk-yardim-kurslari';
+      }
 
       return;
     }
@@ -116,17 +171,44 @@ export function MobileBottomNav({
       aria-label="Mobil navigasyon"
     >
       <div className="mx-2 mb-2">
-        <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0c1222]/[0.97] shadow-[0_-8px_35px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+
+        <div
+          className="
+            relative
+            overflow-hidden
+            rounded-2xl
+            border
+            border-white/[0.08]
+            bg-[#0c1222]/[0.97]
+            shadow-[0_-8px_35px_rgba(0,0,0,0.35)]
+            backdrop-blur-xl
+          "
+        >
 
           {/* Üst parlama */}
-          <div className="pointer-events-none absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+          <div
+            className="
+              pointer-events-none
+              absolute
+              left-0
+              right-0
+              top-0
+              h-px
+              bg-gradient-to-r
+              from-transparent
+              via-white/15
+              to-transparent
+            "
+          />
 
           <div className="grid grid-cols-5 h-[72px] px-1">
 
             {navItems.map((item) => {
+
               const Icon = item.icon;
+
               const isActive =
-                activeItem === item.id;
+                currentItem === item.id;
 
               return (
                 <button
@@ -137,50 +219,117 @@ export function MobileBottomNav({
                       item.action
                     )
                   }
-                  className="relative flex flex-col items-center justify-center gap-1 transition-all duration-200 active:scale-95"
+                  className="
+                    relative
+                    flex
+                    flex-col
+                    items-center
+                    justify-center
+                    gap-1
+                    transition-all
+                    duration-200
+                    active:scale-95
+                  "
                   aria-label={item.label}
+                  aria-current={
+                    isActive
+                      ? 'page'
+                      : undefined
+                  }
                 >
+
                   {/* Aktif arka plan */}
                   {isActive && (
-                    <div className="absolute top-1.5 w-12 h-8 rounded-xl bg-blue-500/10" />
+                    <div
+                      className="
+                        absolute
+                        top-1.5
+                        w-12
+                        h-8
+                        rounded-xl
+                        bg-blue-500/10
+                      "
+                    />
                   )}
 
                   {/* Aktif üst çizgi */}
                   {isActive && (
-                    <div className="absolute top-0.5 w-7 h-0.5 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)]" />
+                    <div
+                      className="
+                        absolute
+                        top-0.5
+                        w-7
+                        h-0.5
+                        rounded-full
+                        bg-blue-500
+                        shadow-[0_0_10px_rgba(59,130,246,0.7)]
+                      "
+                    />
                   )}
 
+                  {/* İkon */}
                   <div
-                    className={`relative z-10 flex items-center justify-center w-7 h-7 transition-all duration-200 ${
-                      isActive
-                        ? 'text-blue-400'
-                        : 'text-white/40'
-                    }`}
+                    className={`
+                      relative
+                      z-10
+                      flex
+                      items-center
+                      justify-center
+                      w-7
+                      h-7
+                      transition-all
+                      duration-200
+                      ${
+                        isActive
+                          ? 'text-blue-400'
+                          : 'text-white/40'
+                      }
+                    `}
                   >
                     <Icon
                       className="w-[20px] h-[20px]"
                       strokeWidth={
-                        isActive ? 2.5 : 1.9
+                        isActive
+                          ? 2.5
+                          : 1.9
                       }
                     />
                   </div>
 
+                  {/* Yazı */}
                   <span
-                    className={`relative z-10 text-[9px] font-semibold leading-none transition-colors duration-200 ${
-                      isActive
-                        ? 'text-blue-400'
-                        : 'text-white/40'
-                    }`}
+                    className={`
+                      relative
+                      z-10
+                      text-[9px]
+                      font-semibold
+                      leading-none
+                      transition-colors
+                      duration-200
+                      ${
+                        isActive
+                          ? 'text-blue-400'
+                          : 'text-white/40'
+                      }
+                    `}
                   >
                     {item.label}
                   </span>
+
                 </button>
               );
             })}
+
           </div>
 
-          {/* iPhone / Android gesture alanı */}
-          <div className="h-[env(safe-area-inset-bottom)] bg-[#0c1222]" />
+          {/* Telefon güvenli alanı */}
+          <div
+            className="
+              h-[env(safe-area-inset-bottom)]
+              bg-[#0c1222]
+            "
+          />
+
         </div>
       </div>
     </nav>

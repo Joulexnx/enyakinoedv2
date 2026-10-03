@@ -19,8 +19,6 @@ import { VolunteersPanel } from '@/components/VolunteersPanel';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
 
 function HomePage() {
-  // Gönüllü sistemi ileride tekrar aktif edilecek.
-  // Mevcut GPS takip altyapısı korunuyor.
   useVolunteerTracking();
 
   const {
@@ -41,44 +39,27 @@ function HomePage() {
 
       <main>
         <HeroSection
-          onRequestLocation={
-            requestLocation
-          }
+          onRequestLocation={requestLocation}
         />
 
         <StatisticsDashboard
-          nearestDistance={
-            nearestDistance
-          }
+          nearestDistance={nearestDistance}
           walkingTime={walkingTime}
         />
 
         <MapSection
-          userLocation={
-            userLocation
-          }
-          geolocationStatus={
-            status
-          }
-          oedLocations={
-            sortedOEDs
-          }
-          onRequestLocation={
-            requestLocation
-          }
+          userLocation={userLocation}
+          geolocationStatus={status}
+          oedLocations={sortedOEDs}
+          onRequestLocation={requestLocation}
         />
 
-        {/* GÖNÜLLÜLER */}
         <VolunteersPanel
-          userLocation={
-            userLocation
-          }
+          userLocation={userLocation}
         />
 
         <NearbyOEDList
-          oedLocations={
-            sortedOEDs
-          }
+          oedLocations={sortedOEDs}
         />
 
         <InformationPanel />
@@ -88,21 +69,13 @@ function HomePage() {
 
       <Footer />
 
-      {/* SADECE MOBİL */}
-      <MobileBottomNav
-        activeItem="home"
-      />
-
     </div>
   );
 }
 
 export default function App() {
   const path =
-    window.location.pathname.replace(
-      /\/+$/,
-      ''
-    ) || '/';
+    window.location.pathname.replace(/\/+$/, '') || '/';
 
   return (
     <ThemeProvider>
@@ -114,6 +87,15 @@ export default function App() {
       ) : (
         <HomePage />
       )}
+
+      {/* Mobil navigasyon tüm sayfalarda aktif */}
+      <MobileBottomNav
+        activeItem={
+          path === '/ilk-yardim-kurslari'
+            ? 'courses'
+            : 'home'
+        }
+      />
 
     </ThemeProvider>
   );

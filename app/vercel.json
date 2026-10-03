@@ -7,6 +7,14 @@
     {
       "source": "/gizlilik-politikasi/",
       "destination": "/index.html"
+    },
+    {
+      "source": "/ilk-yardim-kurslari",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/ilk-yardim-kurslari/",
+      "destination": "/index.html"
     }
   ]
 }
