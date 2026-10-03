@@ -615,7 +615,7 @@ export function MapSection({
                 }
                 scrollWheelZoom={true}
                 zoomControl={true}
-                className="w-full h-full"
+                className="w-full h-full pb-[92px] sm:pb-0"
                 style={{
                   height: '100%',
                   width: '100%',
@@ -846,6 +846,8 @@ export function MapSection({
     </section>
   );
 }
+
+
 
 
 
