@@ -26,7 +26,48 @@ import {
 } from 'lucide-react';
 
 const GOOGLE_SCRIPT_URL =
-  'https://script.google.com/macros/s/AKfycbxscVodtF7JY2-BV7ShWUQF2_2T_s9WwdSGfhriIRy4kE7DzE6M4_D5TQ-2Fo5AZTNyww/exec';
+  'https://script.google.com/macros/s/AKfycbw5QXscGxcBLbKEBSthTXuuYPoi_NQI5kEDjkgwSN8YMvq7qGbtPglJYj3awCWt6xYEXg/exec';
+
+const PAYMENT_URLS = {
+  standardMonthly: 'https://linkode.me/UxMuMqvo2h',
+  premiumMonthly: 'https://linkode.me/hmzbhk4I2n',
+  standardYearly: 'https://linkode.me/NgxvDUs4uD',
+  premiumYearly: 'https://linkode.me/uv7NMpQGpK',
+} as const;
+
+type PackageName = 'Standart' | 'Premium';
+type PaymentPeriod = 'Aylık' | 'Yıllık';
+
+const PACKAGE_OPTIONS: Array<{
+  name: PackageName;
+  monthlyPrice: string;
+  yearlyPrice: string;
+  description: string;
+  features: string[];
+}> = [
+  {
+    name: 'Standart',
+    monthlyPrice: '1.000 TL / ay',
+    yearlyPrice: '10.000 TL / yıl',
+    description: 'Temel eğitim merkezi listeleme paketi.',
+    features: [
+      'Eğitim merkezi profilinin listelenmesi',
+      'Konum ve adres bilgilerinin gösterimi',
+      'Telefon ve web sitesi bilgilerinin gösterimi',
+    ],
+  },
+  {
+    name: 'Premium',
+    monthlyPrice: '2.000 TL / ay',
+    yearlyPrice: '20.000 TL / yıl',
+    description: 'Standart pakete ek olarak Premium görünüm ve etiket.',
+    features: [
+      'Standart paketteki tüm özellikler',
+      'Premium rozeti',
+      'Premium kart görünümü',
+    ],
+  },
+];
 
 type CourseCenter = {
   id: number;
@@ -565,8 +606,29 @@ function ListingApplicationModal({
     kvkk: false,
   });
 
-  const [selectedCourses, setSelectedCourses] =
-    useState<string[]>([]);
+  const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
+  const [selectedPackage, setSelectedPackage] =
+    useState<PackageName>('Standart');
+  const [paymentPeriod, setPaymentPeriod] =
+    useState<PaymentPeriod>('Aylık');
+
+  const selectedPackageInfo = PACKAGE_OPTIONS.find(
+    (item) => item.name === selectedPackage,
+  ) ?? PACKAGE_OPTIONS[0];
+
+  const selectedPrice =
+    paymentPeriod === 'Aylık'
+      ? selectedPackageInfo.monthlyPrice
+      : selectedPackageInfo.yearlyPrice;
+
+  const paymentUrl =
+    selectedPackage === 'Premium'
+      ? paymentPeriod === 'Aylık'
+        ? PAYMENT_URLS.premiumMonthly
+        : PAYMENT_URLS.premiumYearly
+      : paymentPeriod === 'Aylık'
+        ? PAYMENT_URLS.standardMonthly
+        : PAYMENT_URLS.standardYearly;
 
   const toggleCourse = (course: string) => {
     setSelectedCourses((current) =>
@@ -590,7 +652,6 @@ function ListingApplicationModal({
     event: React.FormEvent,
   ) => {
     event.preventDefault();
-
     setError('');
 
     if (
@@ -623,6 +684,8 @@ function ListingApplicationModal({
         courses: selectedCourses.join(', '),
         description: form.description.trim(),
         kvkk: form.kvkk,
+        package: selectedPackage,
+        paymentPeriod,
       };
 
       const response = await fetch(
@@ -669,7 +732,12 @@ function ListingApplicationModal({
         );
       }
 
-      setSubmitted(true);
+      /*
+       * Başvuru önce Google Sheets'e kaydedilir.
+       * Kayıt başarılı olduktan sonra seçilen Linkode
+       * ödeme sayfasına yönlendirilir.
+       */
+      window.location.href = paymentUrl;
     } catch (submitError) {
       console.error(
         'Kurs başvuru gönderim hatası:',
@@ -698,7 +766,7 @@ function ListingApplicationModal({
         }
       />
 
-      <div className="relative w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-3xl bg-white dark:bg-[var(--bg-card)] shadow-2xl border border-[var(--border-subtle)] text-slate-900 dark:text-white">
+      <div className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-3xl bg-white dark:bg-[var(--bg-card)] shadow-2xl border border-[var(--border-subtle)] text-slate-900 dark:text-white">
         <div className="sticky top-0 z-10 flex items-center justify-between gap-4 px-5 sm:px-7 py-4 border-b border-[var(--border-subtle)] bg-white dark:bg-[var(--bg-card)]">
           <div>
             <div className="flex items-center gap-2 text-[var(--accent-blue)] text-xs font-semibold">
@@ -737,9 +805,8 @@ function ListingApplicationModal({
 
             <p className="mt-3 max-w-md mx-auto text-sm text-[var(--text-secondary)] leading-relaxed">
               Eğitim merkezi bilgileriniz başvuru
-              sistemimize kaydedildi. Başvurunuz
-              incelendikten sonra yayınlama süreci
-              için sizinle iletişime geçilebilir.
+              sistemimize kaydedildi. Ödeme sayfasına
+              yönlendiriliyorsunuz.
             </p>
 
             <button
@@ -759,16 +826,15 @@ function ListingApplicationModal({
 
                   <div>
                     <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                      Platformda yer almak için
-                      başvurun
+                      Platformda yer almak için başvurun
                     </p>
 
                     <p className="mt-1 text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                      Merkezinizin bilgilerini doldurun.
-                      Başvurunuz değerlendirildikten
-                      sonra yayınlama ve paket
-                      seçenekleri hakkında sizinle
-                      iletişime geçilebilir.
+                      Merkezinizin bilgilerini doldurun,
+                      paketinizi seçin ve başvuruyu
+                      göndererek ödeme sayfasına geçin.
+                      Ödeme sonrası yayınlama işlemi
+                      yönetim tarafından kontrol edilir.
                     </p>
                   </div>
                 </div>
@@ -1002,6 +1068,165 @@ function ListingApplicationModal({
 
               <section>
                 <div className="flex items-center gap-2 mb-4">
+                  <Star className="w-5 h-5 text-[var(--accent-blue)]" />
+                  <h3 className="font-semibold text-slate-900 dark:text-white">
+                    Paket Seçimi
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {PACKAGE_OPTIONS.map((option) => {
+                    const selected =
+                      selectedPackage === option.name;
+
+                    return (
+                      <button
+                        key={option.name}
+                        type="button"
+                        onClick={() =>
+                          setSelectedPackage(option.name)
+                        }
+                        className={`relative text-left rounded-2xl border p-5 transition-all ${
+                          selected
+                            ? 'border-[var(--accent-blue)] bg-[rgba(23,106,246,0.06)] ring-2 ring-[rgba(23,106,246,0.12)]'
+                            : 'border-[var(--border-subtle)] bg-[var(--bg-primary)] hover:border-[var(--accent-blue)]'
+                        }`}
+                      >
+                        {option.name === 'Premium' && (
+                          <span className="absolute top-4 right-4 inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[10px] font-bold text-white">
+                            <Star className="w-3 h-3 fill-current" />
+                            PREMIUM
+                          </span>
+                        )}
+
+                        <div className="flex items-start gap-3 pr-20">
+                          <div
+                            className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                              selected
+                                ? 'bg-[var(--accent-blue)] text-white'
+                                : 'bg-[rgba(23,106,246,0.09)] text-[var(--accent-blue)]'
+                            }`}
+                          >
+                            {selected ? (
+                              <Check className="w-5 h-5" />
+                            ) : (
+                              <Building2 className="w-5 h-5" />
+                            )}
+                          </div>
+
+                          <div>
+                            <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                              {option.name} Paket
+                            </h4>
+                            <p className="mt-1 text-xs text-[var(--text-secondary)] leading-relaxed">
+                              {option.description}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 space-y-2">
+                          {option.features.map(
+                            (feature) => (
+                              <div
+                                key={feature}
+                                className="flex items-start gap-2 text-xs sm:text-sm text-[var(--text-secondary)]"
+                              >
+                                <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                                <span>{feature}</span>
+                              </div>
+                            ),
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+
+              <section>
+                <div className="flex items-center gap-2 mb-4">
+                  <Clock3 className="w-5 h-5 text-[var(--accent-blue)]" />
+                  <h3 className="font-semibold text-slate-900 dark:text-white">
+                    Ödeme Dönemi
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {([
+                    {
+                      period: 'Aylık' as PaymentPeriod,
+                      price: selectedPackageInfo.monthlyPrice,
+                      description:
+                        'Her ay yenilenen listeleme dönemi.',
+                    },
+                    {
+                      period: 'Yıllık' as PaymentPeriod,
+                      price: selectedPackageInfo.yearlyPrice,
+                      description:
+                        '12 aylık listeleme dönemi.',
+                    },
+                  ]).map((option) => {
+                    const selected =
+                      paymentPeriod === option.period;
+
+                    return (
+                      <button
+                        key={option.period}
+                        type="button"
+                        onClick={() =>
+                          setPaymentPeriod(option.period)
+                        }
+                        className={`flex items-center justify-between gap-4 rounded-2xl border p-4 text-left transition-all ${
+                          selected
+                            ? 'border-[var(--accent-blue)] bg-[rgba(23,106,246,0.06)] ring-2 ring-[rgba(23,106,246,0.12)]'
+                            : 'border-[var(--border-subtle)] bg-[var(--bg-primary)] hover:border-[var(--accent-blue)]'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`w-5 h-5 rounded-full border flex items-center justify-center flex-shrink-0 ${
+                              selected
+                                ? 'border-[var(--accent-blue)]'
+                                : 'border-slate-300 dark:border-slate-600'
+                            }`}
+                          >
+                            {selected && (
+                              <div className="w-2.5 h-2.5 rounded-full bg-[var(--accent-blue)]" />
+                            )}
+                          </div>
+
+                          <div>
+                            <div className="text-sm font-semibold text-slate-900 dark:text-white">
+                              {option.period}
+                            </div>
+                            <div className="mt-0.5 text-xs text-[var(--text-secondary)]">
+                              {option.description}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="text-sm font-bold text-[var(--accent-blue)] whitespace-nowrap">
+                          {option.price}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-4 rounded-xl border border-[rgba(23,106,246,0.14)] bg-[rgba(23,106,246,0.05)] px-4 py-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs text-[var(--text-secondary)]">
+                      Seçiminiz
+                    </span>
+                    <span className="text-sm font-bold text-slate-900 dark:text-white">
+                      {selectedPackage} • {paymentPeriod} • {selectedPrice}
+                    </span>
+                  </div>
+                </div>
+              </section>
+
+              <section>
+                <div className="flex items-center gap-2 mb-4">
                   <FileText className="w-5 h-5 text-[var(--accent-blue)]" />
 
                   <h3 className="font-semibold text-slate-900 dark:text-white">
@@ -1085,12 +1310,12 @@ function ListingApplicationModal({
                     {submitting ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        Gönderiliyor...
+                        Kaydediliyor...
                       </>
                     ) : (
                       <>
                         <Send className="w-4 h-4" />
-                        Başvuruyu Gönder
+                        Başvuruyu Gönder ve Ödeme Yap
                       </>
                     )}
                   </button>
