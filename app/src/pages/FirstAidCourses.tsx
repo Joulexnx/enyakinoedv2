@@ -261,6 +261,7 @@ function normalizeCenter(
       'Kurs Merkezi',
       'kurs merkezi',
       'centerName',
+      'name',
     ),
 
     representative: getField(
@@ -1216,6 +1217,7 @@ function ListingApplicationModal({
                     onChange={(value) =>
                       updateField(
                         'centerName',
+      'name',
                         value,
                       )
                     }
@@ -2273,5 +2275,6 @@ export default function FirstAidCourses() {
     </div>
   );
 }
+
 
 
