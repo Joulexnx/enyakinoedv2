@@ -216,6 +216,17 @@ function getField(
  * Durum hiç yoksa kaydı elemeden devam ediyoruz.
  */
 function isPublished(item: Record<string, unknown>): boolean {
+  /*
+   * Yayın tarihi ve bitiş tarihi Apps Script tarafında
+   * kontrol ediliyor. Frontend'de tekrar tarih parse etmiyoruz.
+   *
+   * Bunun nedeni Google Sheets'teki GG.AA.YYYY formatının
+   * JavaScript'in new Date() parser'ı tarafından yanlış
+   * yorumlanabilmesi.
+   *
+   * API Durum alanını gönderiyorsa ek güvenlik kontrolü yapıyoruz.
+   * Durum alanı yoksa Apps Script filtresine güveniyoruz.
+   */
   const status = getField(
     item,
     'durum',
@@ -225,54 +236,12 @@ function isPublished(item: Record<string, unknown>): boolean {
     .trim()
     .toLocaleLowerCase('tr-TR');
 
-  // API normalize edilmiş kayıt gönderiyorsa Durum bulunmayabilir.
-  // Bu durumda Apps Script'in yaptığı filtrelemeye güveniyoruz.
   if (
     status &&
     status !== 'onaylandı' &&
     status !== 'onaylandi'
   ) {
     return false;
-  }
-
-  const now = new Date();
-
-  const publishDateText = getField(
-    item,
-    'yayın tarihi',
-    'Yayın Tarihi',
-    'yayin tarihi',
-    'Yayin Tarihi',
-  );
-
-  const endDateText = getField(
-    item,
-    'bitiş tarihi',
-    'Bitiş Tarihi',
-    'bitis tarihi',
-    'Bitis Tarihi',
-  );
-
-  if (publishDateText) {
-    const publishDate = new Date(publishDateText);
-
-    if (
-      !Number.isNaN(publishDate.getTime()) &&
-      now < publishDate
-    ) {
-      return false;
-    }
-  }
-
-  if (endDateText) {
-    const endDate = new Date(endDateText);
-
-    if (
-      !Number.isNaN(endDate.getTime()) &&
-      now > endDate
-    ) {
-      return false;
-    }
   }
 
   return true;
@@ -2304,4 +2273,5 @@ export default function FirstAidCourses() {
     </div>
   );
 }
+
 
