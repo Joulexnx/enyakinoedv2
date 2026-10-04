@@ -73,6 +73,7 @@ const PACKAGE_OPTIONS: Array<{
       'Premium Eğitim Merkezi alanı',
       'İlçe aramalarında öncelik',
       'Duyuru alanı',
+      'Kurs merkezi yönetim paneli',
     ],
   },
 ];
@@ -2275,6 +2276,7 @@ export default function FirstAidCourses() {
     </div>
   );
 }
+
 
 
 
