@@ -1218,7 +1218,7 @@ function ListingApplicationModal({
                     onChange={(value) =>
                       updateField(
                         'centerName',
-      'name',
+      
                         value,
                       )
                     }
@@ -2276,6 +2276,7 @@ export default function FirstAidCourses() {
     </div>
   );
 }
+
 
 
 
