@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 
 const GOOGLE_SCRIPT_URL =
-  'https://script.google.com/macros/s/AKfycbwkZnYu3QWV-cItPyKAgOo8NutFhp-PASve32-RvEp6oGjvTp3A_X8bP99LW_kJB8jr1g/exec';
+  'https://script.google.com/macros/s/AKfycbyBnMtkyE7RQUZ44nYhnIU4MIhBouX3wPLKt6oyYu26yeAm-f7kANrjkYirCePtOln97g/exec';
 
 const PAYMENT_URLS = {
   standardMonthly: 'https://linkode.me/UxMuMqvo2h',
@@ -177,35 +177,6 @@ function normalizeWhatsApp(value: unknown): string {
     .trim();
 }
 
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      const result = String(reader.result ?? '');
-      const commaIndex = result.indexOf(',');
-      resolve(
-        commaIndex >= 0
-          ? result.slice(commaIndex + 1)
-          : result,
-      );
-    };
-
-    reader.onerror = () => {
-      reject(new Error(`${file.name} okunamadı.`));
-    };
-
-    reader.readAsDataURL(file);
-  });
-}
-
-function isSupportedImage(file: File): boolean {
-  return [
-    'image/jpeg',
-    'image/png',
-    'image/webp',
-  ].includes(file.type);
-}
 function normalizePackage(value: unknown): string {
   const packageName = String(value ?? '').trim();
 
@@ -1020,19 +991,9 @@ function ListingApplicationModal({
     address: '',
     website: '',
     description: '',
-    logo: '',
-    gallery: '',
-    whatsapp: '',
-    announcement: '',
     kvkk: false,
   });
 
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
-  const [logoPreview, setLogoPreview] = useState('');
-  const [galleryPreviews, setGalleryPreviews] = useState<
-    Array<{ file: File; url: string }>
-  >([]);
 
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
   const [selectedPackage, setSelectedPackage] =
@@ -1076,91 +1037,6 @@ function ListingApplicationModal({
     }));
   };
 
-  const handleLogoChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    if (!isSupportedImage(file)) {
-      setError('Logo için JPG, PNG veya WEBP dosyası seçebilirsiniz.');
-      event.target.value = '';
-      return;
-    }
-
-    if (file.size > 2 * 1024 * 1024) {
-      setError('Logo dosyası en fazla 2 MB olabilir.');
-      event.target.value = '';
-      return;
-    }
-
-    if (logoPreview) {
-      URL.revokeObjectURL(logoPreview);
-    }
-
-    setLogoFile(file);
-    setLogoPreview(URL.createObjectURL(file));
-    setError('');
-  };
-
-  const handleGalleryChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const files = Array.from(event.target.files ?? []);
-
-    if (files.length === 0) {
-      return;
-    }
-
-    const combined = [...galleryFiles, ...files];
-
-    if (combined.length > 5) {
-      setError('En fazla 5 merkez fotoğrafı yükleyebilirsiniz.');
-      event.target.value = '';
-      return;
-    }
-
-    if (combined.some((file) => !isSupportedImage(file))) {
-      setError('Merkez fotoğrafları JPG, PNG veya WEBP formatında olmalıdır.');
-      event.target.value = '';
-      return;
-    }
-
-    if (combined.some((file) => file.size > 4 * 1024 * 1024)) {
-      setError('Her merkez fotoğrafı en fazla 4 MB olabilir.');
-      event.target.value = '';
-      return;
-    }
-
-    const newFiles = files.map((file) => ({
-      file,
-      url: URL.createObjectURL(file),
-    }));
-
-    setGalleryFiles(combined);
-    setGalleryPreviews((current) => [...current, ...newFiles]);
-    setError('');
-    event.target.value = '';
-  };
-
-  const removeGalleryFile = (index: number) => {
-    const preview = galleryPreviews[index];
-
-    if (preview) {
-      URL.revokeObjectURL(preview.url);
-    }
-
-    setGalleryFiles((current) =>
-      current.filter((_, fileIndex) => fileIndex !== index),
-    );
-
-    setGalleryPreviews((current) =>
-      current.filter((_, previewIndex) => previewIndex !== index),
-    );
-  };
 
   const handleSubmit = async (
     event: React.FormEvent,
@@ -1184,18 +1060,6 @@ function ListingApplicationModal({
       return;
     }
 
-    if (selectedPackage === 'Premium') {
-      if (logoFile && !isSupportedImage(logoFile)) {
-        setError('Logo için JPG, PNG veya WEBP dosyası seçebilirsiniz.');
-        return;
-      }
-
-      if (galleryFiles.length > 5) {
-        setError('En fazla 5 merkez fotoğrafı yükleyebilirsiniz.');
-        return;
-      }
-    }
-
     setSubmitting(true);
 
     try {
@@ -1209,30 +1073,6 @@ function ListingApplicationModal({
         website: form.website.trim(),
         courses: selectedCourses.join(', '),
         description: form.description.trim(),
-        whatsapp: selectedPackage === 'Premium' ? form.whatsapp.trim() : '',
-        announcement:
-          selectedPackage === 'Premium'
-            ? form.announcement.trim()
-            : '',
-        uploads:
-          selectedPackage === 'Premium'
-            ? {
-                logo: logoFile
-                  ? {
-                      name: logoFile.name,
-                      type: logoFile.type,
-                      data: await fileToBase64(logoFile),
-                    }
-                  : null,
-                gallery: await Promise.all(
-                  galleryFiles.map(async (file) => ({
-                    name: file.name,
-                    type: file.type,
-                    data: await fileToBase64(file),
-                  })),
-                ),
-              }
-            : null,
         kvkk: form.kvkk,
         package: selectedPackage,
         paymentPeriod,
@@ -1796,154 +1636,7 @@ function ListingApplicationModal({
                 />
               </section>
 
-              {selectedPackage === 'Premium' && (
-                <section>
-                  <div className="flex items-center gap-2 mb-4">
-                    <Star className="w-5 h-5 text-[var(--accent-blue)]" />
-                    <h3 className="font-semibold text-[var(--text-primary)]">
-                      Premium Profil Bilgileri
-                    </h3>
-                  </div>
 
-                  <div className="rounded-2xl border border-[rgba(23,106,246,0.14)] bg-[rgba(23,106,246,0.05)] p-4 mb-4">
-                    <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                      Premium profilinizi zenginleştirmek için logo,
-                      merkez fotoğrafları, WhatsApp numarası ve duyuru
-                      bilgilerinizi ekleyebilirsiniz.
-                    </p>
-                  </div>
-
-                  <div className="space-y-5">
-                    <div>
-                      <FieldLabel>
-                        Logo
-                      </FieldLabel>
-
-                      <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
-                        <label className="inline-flex items-center justify-center gap-2 h-12 px-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm font-semibold text-[var(--text-primary)] hover:border-[var(--accent-blue)] hover:text-[var(--accent-blue)] cursor-pointer transition-all">
-                          <Image className="w-4 h-4" />
-                          Logo Seç
-                          <input
-                            type="file"
-                            accept="image/jpeg,image/png,image/webp"
-                            onChange={handleLogoChange}
-                            className="sr-only"
-                          />
-                        </label>
-
-                        {logoFile && (
-                          <div className="flex items-center gap-3">
-                            {logoPreview && (
-                              <img
-                                src={logoPreview}
-                                alt="Logo önizleme"
-                                className="w-12 h-12 rounded-xl object-contain border border-[var(--border-subtle)] bg-[var(--bg-primary)]"
-                              />
-                            )}
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium text-[var(--text-primary)] truncate max-w-[240px]">
-                                {logoFile.name}
-                              </p>
-                              <p className="text-xs text-[var(--text-secondary)]">
-                                {(logoFile.size / 1024 / 1024).toFixed(2)} MB
-                              </p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      <p className="mt-2 text-xs text-[var(--text-secondary)]">
-                        JPG, PNG veya WEBP • Maksimum 2 MB
-                      </p>
-                    </div>
-
-                    <div>
-                      <div className="flex items-center justify-between gap-3">
-                        <FieldLabel>
-                          Merkez Fotoğrafları
-                        </FieldLabel>
-                        <span className="text-xs text-[var(--text-secondary)]">
-                          {galleryFiles.length}/5
-                        </span>
-                      </div>
-
-                      <label className="flex flex-col items-center justify-center gap-2 min-h-28 rounded-2xl border border-dashed border-[var(--border-subtle)] bg-[var(--bg-primary)] px-4 py-5 text-center hover:border-[var(--accent-blue)] transition-all cursor-pointer">
-                        <Image className="w-6 h-6 text-[var(--accent-blue)]" />
-                        <span className="text-sm font-semibold text-[var(--text-primary)]">
-                          Fotoğraf Ekle
-                        </span>
-                        <span className="text-xs text-[var(--text-secondary)]">
-                          En fazla 5 fotoğraf • Her biri 4 MB
-                        </span>
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          multiple
-                          onChange={handleGalleryChange}
-                          disabled={galleryFiles.length >= 5}
-                          className="sr-only"
-                        />
-                      </label>
-
-                      {galleryPreviews.length > 0 && (
-                        <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                          {galleryPreviews.map((item, index) => (
-                            <div
-                              key={`${item.file.name}-${index}`}
-                              className="relative overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)]"
-                            >
-                              <img
-                                src={item.url}
-                                alt={`Merkez fotoğrafı ${index + 1}`}
-                                className="w-full h-28 object-cover"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => removeGalleryFile(index)}
-                                className="absolute top-2 right-2 w-8 h-8 rounded-lg bg-black/65 text-white flex items-center justify-center hover:bg-black/80 transition-colors"
-                                aria-label={`${index + 1}. fotoğrafı kaldır`}
-                              >
-                                <X className="w-4 h-4" />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    <InputField
-                      icon={<MessageCircle className="w-4 h-4" />}
-                      label="WhatsApp"
-                      placeholder="905XXXXXXXXX"
-                      value={form.whatsapp}
-                      onChange={(value) =>
-                        updateField('whatsapp', value)
-                      }
-                      type="tel"
-                    />
-
-                    <div>
-                      <FieldLabel>
-                        Duyuru
-                      </FieldLabel>
-
-                      <textarea
-                        value={form.announcement}
-                        onChange={(event) =>
-                          updateField(
-                            'announcement',
-                            event.target.value,
-                          )
-                        }
-                        placeholder="Örn. Ekim ayı ilk yardım eğitim kayıtlarımız başladı."
-                        rows={3}
-                        maxLength={300}
-                        className="w-full px-4 py-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] outline-none resize-none focus:border-[var(--accent-blue)] transition-all"
-                      />
-                    </div>
-                  </div>
-                </section>
-              )}
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -2611,10 +2304,4 @@ export default function FirstAidCourses() {
     </div>
   );
 }
-
-
-
-
-
-
 

@@ -1,4 +1,4 @@
-import {
+﻿import {
   useEffect,
   useMemo,
   useRef,
@@ -30,7 +30,7 @@ import {
 } from 'lucide-react';
 
 const GOOGLE_SCRIPT_URL =
-  'https://script.google.com/macros/s/AKfycbxQS40CPQx4jA5a0BgnT3b38oQ16cRui3kpjxDtoQaMkdnJ95HpnJ3t4GM77Z9-HZ_7VA/exec';
+  'https://script.google.com/macros/s/AKfycbyBnMtkyE7RQUZ44nYhnIU4MIhBouX3wPLKt6oyYu26yeAm-f7kANrjkYirCePtOln97g/exec';
 
 const MAX_GALLERY = 5;
 
