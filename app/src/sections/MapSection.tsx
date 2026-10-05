@@ -33,7 +33,7 @@ const ANKARA_CENTER: [number, number] = [39.925533, 32.866287];
 
 /*
  * CARTO Voyager
- * API anahtarý doðrudan URL üzerinde kullanýlýyor.
+ * API anahtarÄ± doÄŸrudan URL Ã¼zerinde kullanÄ±lÄ±yor.
  */
 const CARTO_TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
@@ -512,16 +512,16 @@ export function MapSection({
             <div className="inline-flex items-center gap-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-red-500" />
               <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
-                Ankara OED Haritasý
+                Ankara OED HaritasÄ±
               </span>
             </div>
 
             <h2 className="text-xl sm:text-2xl font-semibold text-[var(--text-primary)] tracking-tight">
-              OED Konumlarý
+              OED KonumlarÄ±
             </h2>
 
             <p className="text-sm sm:text-base text-[var(--text-secondary)] mt-1">
-              Size en yakýn otomatik eksternal defibrilatörü harita üzerinden bulun.
+              Size en yakÄ±n otomatik eksternal defibrilatÃ¶rÃ¼ harita Ã¼zerinden bulun.
             </p>
           </div>
 
@@ -533,7 +533,7 @@ export function MapSection({
           >
             <LocateFixed className="w-4 h-4 text-[var(--accent-blue)]" />
             {geolocationStatus === 'loading'
-              ? 'Konum alýnýyor...'
+              ? 'Konum alÄ±nÄ±yor...'
               : 'Konumumu Bul'}
           </button>
         </div>
@@ -568,7 +568,7 @@ export function MapSection({
             <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 shadow-sm">
               <MapPin className="w-3.5 h-3.5 text-[var(--text-muted)]" />
               <span className="text-[11px] font-medium text-[var(--text-secondary)]">
-                {oedLocations.length} OED noktasý
+                {oedLocations.length} OED noktasÄ±
               </span>
             </div>
           )}
@@ -650,13 +650,13 @@ export function MapSection({
                             </h3>
 
                             <p className="text-[10px] text-[var(--text-muted)]">
-                              Yardým konumu
+                              YardÄ±m konumu
                             </p>
                           </div>
                         </div>
 
                         <p className="text-xs text-[var(--text-secondary)]">
-                          Yardým gerekiyor. En yakýn OED noktasýný kontrol edin.
+                          YardÄ±m gerekiyor. En yakÄ±n OED noktasÄ±nÄ± kontrol edin.
                         </p>
                       </div>
                     </Popup>
@@ -741,7 +741,7 @@ export function MapSection({
 
                                   {isNearest && (
                                     <span className="text-[9px] uppercase tracking-[0.06em] font-bold bg-slate-900 text-white rounded-full px-2 py-0.5">
-                                      En Yakýn
+                                      En YakÄ±n
                                     </span>
                                   )}
                                 </div>
@@ -772,9 +772,9 @@ export function MapSection({
 
                                 <span className="text-[11px] font-semibold text-[var(--text-secondary)]">
                                   {oed.status === 'available'
-                                    ? 'Müsait'
+                                    ? 'MÃ¼sait'
                                     : oed.status === 'in-use'
-                                      ? 'Kullanýmda'
+                                      ? 'KullanÄ±mda'
                                       : 'Durum bilinmiyor'}
                                 </span>
                               </div>
@@ -829,11 +829,11 @@ export function MapSection({
 
                     <div>
                       <p className="text-[10px] font-bold text-[var(--text-primary)]">
-                        Ankara OED Haritasý
+                        Ankara OED HaritasÄ±
                       </p>
 
                       <p className="text-[9px] text-[var(--text-muted)]">
-                        Yakýnýnýzdaki noktalarý keþfedin
+                        YakÄ±nÄ±nÄ±zdaki noktalarÄ± keÅŸfedin
                       </p>
                     </div>
                   </div>
