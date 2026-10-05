@@ -1,4 +1,4 @@
-ï»¿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   MapContainer,
   TileLayer,
@@ -33,7 +33,7 @@ const ANKARA_CENTER: [number, number] = [39.925533, 32.866287];
 
 /*
  * CARTO Voyager
- * API anahtarÄ± doÄŸrudan URL Ã¼zerinde kullanÄ±lÄ±yor.
+ * API anahtarý doðrudan URL üzerinde kullanýlýyor.
  */
 const CARTO_TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
@@ -512,16 +512,16 @@ export function MapSection({
             <div className="inline-flex items-center gap-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-red-500" />
               <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
-                Ankara OED HaritasÄ±
+                Ankara OED Haritasý
               </span>
             </div>
 
             <h2 className="text-xl sm:text-2xl font-semibold text-[var(--text-primary)] tracking-tight">
-              OED KonumlarÄ±
+              OED Konumlarý
             </h2>
 
             <p className="text-sm sm:text-base text-[var(--text-secondary)] mt-1">
-              Size en yakÄ±n otomatik eksternal defibrilatÃ¶rÃ¼ harita Ã¼zerinden bulun.
+              Size en yakýn otomatik eksternal defibrilatörü harita üzerinden bulun.
             </p>
           </div>
 
@@ -533,7 +533,7 @@ export function MapSection({
           >
             <LocateFixed className="w-4 h-4 text-[var(--accent-blue)]" />
             {geolocationStatus === 'loading'
-              ? 'Konum alÄ±nÄ±yor...'
+              ? 'Konum alýnýyor...'
               : 'Konumumu Bul'}
           </button>
         </div>
@@ -568,7 +568,7 @@ export function MapSection({
             <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 shadow-sm">
               <MapPin className="w-3.5 h-3.5 text-[var(--text-muted)]" />
               <span className="text-[11px] font-medium text-[var(--text-secondary)]">
-                {oedLocations.length} OED noktasÄ±
+                {oedLocations.length} OED noktasý
               </span>
             </div>
           )}
@@ -592,7 +592,7 @@ export function MapSection({
             duration: 0.6,
             ease: [0.22, 1, 0.36, 1],
           }}
-                    className="relative rounded-[22px] overflow-hidden border border-[var(--border)] bg-[#e8edf3] shadow-[0_18px_55px_rgba(15,23,42,0.10)] h-[calc(clamp(390px,52vw,620px)-92px)] sm:h-[clamp(390px,52vw,620px)]"
+                    className="relative z-0 isolate rounded-[22px] overflow-hidden border border-[var(--border)] bg-[#e8edf3] shadow-[0_18px_55px_rgba(15,23,42,0.10)] h-[390px] sm:h-[clamp(450px,52vw,620px)]"
           style={{
             height: 'clamp(390px, 52vw, 620px)',
           }}
@@ -650,13 +650,13 @@ export function MapSection({
                             </h3>
 
                             <p className="text-[10px] text-[var(--text-muted)]">
-                              YardÄ±m konumu
+                              Yardým konumu
                             </p>
                           </div>
                         </div>
 
                         <p className="text-xs text-[var(--text-secondary)]">
-                          YardÄ±m gerekiyor. En yakÄ±n OED noktasÄ±nÄ± kontrol edin.
+                          Yardým gerekiyor. En yakýn OED noktasýný kontrol edin.
                         </p>
                       </div>
                     </Popup>
@@ -741,7 +741,7 @@ export function MapSection({
 
                                   {isNearest && (
                                     <span className="text-[9px] uppercase tracking-[0.06em] font-bold bg-slate-900 text-white rounded-full px-2 py-0.5">
-                                      En YakÄ±n
+                                      En Yakýn
                                     </span>
                                   )}
                                 </div>
@@ -772,9 +772,9 @@ export function MapSection({
 
                                 <span className="text-[11px] font-semibold text-[var(--text-secondary)]">
                                   {oed.status === 'available'
-                                    ? 'MÃ¼sait'
+                                    ? 'Müsait'
                                     : oed.status === 'in-use'
-                                      ? 'KullanÄ±mda'
+                                      ? 'Kullanýmda'
                                       : 'Durum bilinmiyor'}
                                 </span>
                               </div>
@@ -829,11 +829,11 @@ export function MapSection({
 
                     <div>
                       <p className="text-[10px] font-bold text-[var(--text-primary)]">
-                        Ankara OED HaritasÄ±
+                        Ankara OED Haritasý
                       </p>
 
                       <p className="text-[9px] text-[var(--text-muted)]">
-                        YakÄ±nÄ±nÄ±zdaki noktalarÄ± keÅŸfedin
+                        Yakýnýnýzdaki noktalarý keþfedin
                       </p>
                     </div>
                   </div>
@@ -846,6 +846,9 @@ export function MapSection({
     </section>
   );
 }
+
+
+
 
 
 
