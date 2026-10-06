@@ -77,7 +77,7 @@ export function HeroSection({
               variants={itemVariants}
               className="mt-4 text-base sm:text-lg text-[var(--text-secondary)] leading-relaxed"
             >
-              Ankara'da ani kalp durması durumunda size en yakın
+              Türkiye'de ani kalp durması durumunda size en yakın
               otomatik eksternal defibrilatörü (OED) kolayca bulun.
             </motion.p>
 
@@ -155,7 +155,7 @@ export function HeroSection({
 
               <span className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
                 <span>📍</span>
-                25 Nokta
+                 86 OED Noktası
               </span>
 
               <span className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">

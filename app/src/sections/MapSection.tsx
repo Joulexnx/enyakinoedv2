@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import {
   MapContainer,
   TileLayer,
@@ -265,10 +265,13 @@ const emergencyIcon = L.divIcon({
 function MapController({
   userLocation,
   emergencyLocation,
+  oedLocations,
 }: {
   userLocation: UserLocation | null;
   emergencyLocation: [number, number] | null;
+  oedLocations: OEDLocation[];
 }) {
+
   const map = useMap();
 
   useEffect(() => {
@@ -288,8 +291,23 @@ function MapController({
       return;
     }
 
-    map.setView(ANKARA_CENTER, 12);
-  }, [userLocation, emergencyLocation, map]);
+        if (oedLocations.length > 0) {
+      const bounds = L.latLngBounds(
+        oedLocations.map((oed) => [oed.lat, oed.lng] as [number, number])
+      );
+
+      map.fitBounds(bounds, {
+        padding: [40, 40],
+        maxZoom: 8,
+        animate: true,
+        duration: 1,
+      });
+
+      return;
+    }
+
+    map.setView([39, 35], 6);
+  }, [userLocation, emergencyLocation, oedLocations, map]);
 
   return null;
 }
@@ -512,7 +530,7 @@ export function MapSection({
             <div className="inline-flex items-center gap-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-red-500" />
               <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
-                Ankara OED Haritası
+                Türkiye OED Haritası
               </span>
             </div>
 
@@ -630,6 +648,7 @@ export function MapSection({
                 <MapController
                   userLocation={userLocation}
                   emergencyLocation={emergencyLocation}
+                  oedLocations={oedLocations}
                 />
 
                 {emergencyLocation && (
@@ -829,7 +848,7 @@ export function MapSection({
 
                     <div>
                       <p className="text-[10px] font-bold text-[var(--text-primary)]">
-                        Ankara OED Haritası
+                        Türkiye OED Haritası
                       </p>
 
                       <p className="text-[9px] text-[var(--text-muted)]">

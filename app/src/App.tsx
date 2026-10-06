@@ -45,6 +45,7 @@ function HomePage() {
         <StatisticsDashboard
           nearestDistance={nearestDistance}
           walkingTime={walkingTime}
+          oedCount={sortedOEDs.length}
         />
 
         <MapSection

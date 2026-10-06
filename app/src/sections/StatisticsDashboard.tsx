@@ -4,9 +4,15 @@ import { StatCard } from '@/components/StatCard';
 interface StatisticsDashboardProps {
   nearestDistance: string;
   walkingTime: string;
+  oedCount: number;
 }
 
-export function StatisticsDashboard({ nearestDistance, walkingTime }: StatisticsDashboardProps) {
+export function StatisticsDashboard({
+  nearestDistance,
+  walkingTime,
+  oedCount,
+}: StatisticsDashboardProps) {
+
   return (
     <section className="py-8 bg-[var(--bg-card)] border-y border-[var(--border-subtle)]">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
@@ -14,8 +20,8 @@ export function StatisticsDashboard({ nearestDistance, walkingTime }: Statistics
           <StatCard
             icon={<Heart className="w-5 h-5 text-[var(--accent-red)]" />}
             label="Toplam OED"
-            value={25}
-            subtitle="Ankara'da kayıtlı cihaz"
+            value={oedCount}
+            subtitle="Türkiye'de kayıtlı cihaz"
             color="red"
             isCounter
             delay={0}

@@ -134,7 +134,7 @@ export function HeaderBar() {
               </span>
 
               <span className="hidden sm:block mt-1 text-[10px] font-medium tracking-[0.16em] uppercase text-[var(--text-muted)]">
-                Ankara OED Haritası
+                Türkiye OED Haritası
               </span>
             </div>
           </button>
