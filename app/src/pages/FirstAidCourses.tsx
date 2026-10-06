@@ -71,17 +71,106 @@ const PACKAGE_OPTIONS: Array<{
       'Logo ve merkez fotoğrafları',
       'WhatsApp iletişim butonu',
       'Premium Eğitim Merkezi alanı',
-      'İlçe aramalarında öncelik',
+      'İl ve ilçe aramalarında öncelik',
       'Duyuru alanı',
       'Kurs merkezi yönetim paneli',
     ],
   },
 ];
 
+export const TURKEY_CITIES: Record<string, string[]> = {
+  Adana: ['Aladağ', 'Ceyhan', 'Çukurova', 'Feke', 'İmamoğlu', 'Karaisalı', 'Karataş', 'Kozan', 'Pozantı', 'Saimbeyli', 'Sarıçam', 'Seyhan', 'Tufanbeyli', 'Yumurtalık', 'Yüreğir'],
+  Adıyaman: ['Besni', 'Çelikhan', 'Gerger', 'Gölbaşı', 'Kahta', 'Merkez', 'Samsat', 'Sincik', 'Tut'],
+  Afyonkarahisar: ['Başmakçı', 'Bayat', 'Bolvadin', 'Çay', 'Çobanlar', 'Dazkırı', 'Dinar', 'Emirdağ', 'Evciler', 'Hocalar', 'İhsaniye', 'İscehisar', 'Kızılören', 'Merkez', 'Sandıklı', 'Sinanpaşa', 'Sultandağı', 'Şuhut'],
+  Ağrı: ['Diyadin', 'Doğubayazıt', 'Eleşkirt', 'Hamur', 'Merkez', 'Patnos', 'Taşlıçay', 'Tutak'],
+  Amasya: ['Göynücek', 'Gümüşhacıköy', 'Hamamözü', 'Merkez', 'Merzifon', 'Suluova', 'Taşova'],
+  Ankara: ['Akyurt', 'Altındağ', 'Ayaş', 'Bala', 'Beypazarı', 'Çamlıdere', 'Çankaya', 'Çubuk', 'Elmadağ', 'Etimesgut', 'Evren', 'Gölbaşı', 'Güdül', 'Haymana', 'Kalecik', 'Kahramankazan', 'Keçiören', 'Kızılcahamam', 'Mamak', 'Nallıhan', 'Polatlı', 'Pursaklar', 'Sincan', 'Şereflikoçhisar', 'Yenimahalle'],
+  Antalya: ['Akseki', 'Aksu', 'Alanya', 'Demre', 'Döşemealtı', 'Elmalı', 'Finike', 'Gazipaşa', 'Gündoğmuş', 'İbradı', 'Kaş', 'Kemer', 'Kepez', 'Konyaaltı', 'Korkuteli', 'Kumluca', 'Manavgat', 'Muratpaşa', 'Serik'],
+  Artvin: ['Ardanuç', 'Arhavi', 'Borçka', 'Hopa', 'Kemalpaşa', 'Merkez', 'Murgul', 'Şavşat', 'Yusufeli'],
+  Aydın: ['Bozdoğan', 'Buharkent', 'Çine', 'Didim', 'Efeler', 'Germencik', 'İncirliova', 'Karacasu', 'Karpuzlu', 'Koçarlı', 'Köşk', 'Kuşadası', 'Kuyucak', 'Nazilli', 'Söke', 'Sultanhisar', 'Yenipazar'],
+  Balıkesir: ['Altıeylül', 'Ayvalık', 'Balya', 'Bandırma', 'Bigadiç', 'Burhaniye', 'Dursunbey', 'Edremit', 'Erdek', 'Gömeç', 'Gönen', 'Havran', 'İvrindi', 'Karesi', 'Kepsut', 'Manyas', 'Marmara', 'Savaştepe', 'Sındırgı', 'Susurluk'],
+  Bilecik: ['Bozüyük', 'Gölpazarı', 'İnhisar', 'Merkez', 'Osmaneli', 'Pazaryeri', 'Söğüt', 'Yenipazar'],
+  Bingöl: ['Adaklı', 'Genç', 'Karlıova', 'Kiğı', 'Merkez', 'Solhan', 'Yayladere', 'Yedisu'],
+  Bitlis: ['Adilcevaz', 'Ahlat', 'Güroymak', 'Hizan', 'Merkez', 'Mutki', 'Tatvan'],
+  Bolu: ['Dörtdivan', 'Gerede', 'Göynük', 'Kıbrıscık', 'Mengen', 'Merkez', 'Mudurnu', 'Seben', 'Yeniçağa'],
+  Burdur: ['Ağlasun', 'Altınyayla', 'Bucak', 'Çavdır', 'Çeltikçi', 'Gölhisar', 'Karamanlı', 'Kemer', 'Merkez', 'Tefenni', 'Yeşilova'],
+  Bursa: ['Büyükorhan', 'Gemlik', 'Gürsu', 'Harmancık', 'İnegöl', 'İznik', 'Karacabey', 'Keles', 'Kestel', 'Mudanya', 'Mustafakemalpaşa', 'Nilüfer', 'Orhaneli', 'Orhangazi', 'Osmangazi', 'Yenişehir', 'Yıldırım'],
+  Çanakkale: ['Ayvacık', 'Bayramiç', 'Biga', 'Bozcaada', 'Çan', 'Eceabat', 'Ezine', 'Gelibolu', 'Gökçeada', 'Lapseki', 'Merkez', 'Yenice'],
+  Çankırı: ['Atkaracalar', 'Bayramören', 'Çerkeş', 'Eldivan', 'Ilgaz', 'Kızılırmak', 'Korgun', 'Kurşunlu', 'Merkez', 'Orta', 'Şabanözü', 'Yapraklı'],
+  Çorum: ['Alaca', 'Bayat', 'Boğazkale', 'Dodurga', 'İskilip', 'Kargı', 'Laçin', 'Mecitözü', 'Merkez', 'Oğuzlar', 'Ortaköy', 'Osmancık', 'Sungurlu', 'Uğurludağ'],
+  Denizli: ['Acıpayam', 'Babadağ', 'Baklan', 'Bekilli', 'Beyağaç', 'Bozkurt', 'Buldan', 'Çal', 'Çameli', 'Çardak', 'Çivril', 'Güney', 'Honaz', 'Kale', 'Merkezefendi', 'Pamukkale', 'Sarayköy', 'Serinhisar', 'Tavas'],
+  Diyarbakır: ['Bağlar', 'Bismil', 'Çermik', 'Çınar', 'Çüngüş', 'Dicle', 'Eğil', 'Ergani', 'Hani', 'Hazro', 'Kayapınar', 'Kocaköy', 'Kulp', 'Lice', 'Silvan', 'Sur', 'Yenişehir'],
+  Edirne: ['Enez', 'Havsa', 'İpsala', 'Keşan', 'Lalapaşa', 'Meriç', 'Merkez', 'Süloğlu', 'Uzunköprü'],
+  Elazığ: ['Ağın', 'Alacakaya', 'Arıcak', 'Baskil', 'Karakoçan', 'Keban', 'Kovancılar', 'Maden', 'Merkez', 'Palu', 'Sivrice'],
+  Erzincan: ['Çayırlı', 'İliç', 'Kemah', 'Kemaliye', 'Merkez', 'Otlukbeli', 'Refahiye', 'Tercan', 'Üzümlü'],
+  Erzurum: ['Aşkale', 'Aziziye', 'Çat', 'Hınıs', 'Horasan', 'İspir', 'Karaçoban', 'Karayazı', 'Köprüköy', 'Narman', 'Oltu', 'Olur', 'Palandöken', 'Pasinler', 'Pazaryolu', 'Şenkaya', 'Tekman', 'Tortum', 'Uzundere', 'Yakutiye'],
+  Eskişehir: ['Alpu', 'Beylikova', 'Çifteler', 'Günyüzü', 'Han', 'İnönü', 'Mahmudiye', 'Mihalgazi', 'Mihalıççık', 'Odunpazarı', 'Seyitgazi', 'Sivrihisar', 'Tepebaşı'],
+  Gaziantep: ['Araban', 'İslahiye', 'Karkamış', 'Nizip', 'Nurdağı', 'Oğuzeli', 'Şahinbey', 'Şehitkamil', 'Yavuzeli'],
+  Giresun: ['Alucra', 'Bulancak', 'Çamoluk', 'Çanakçı', 'Dereli', 'Doğankent', 'Espiye', 'Eynesil', 'Görele', 'Güce', 'Keşap', 'Merkez', 'Piraziz', 'Şebinkarahisar', 'Tirebolu', 'Yağlıdere'],
+  Gümüşhane: ['Kelkit', 'Köse', 'Kürtün', 'Merkez', 'Şiran', 'Torul'],
+  Hakkari: ['Çukurca', 'Derecik', 'Merkez', 'Şemdinli', 'Yüksekova'],
+  Hatay: ['Altınözü', 'Antakya', 'Arsuz', 'Belen', 'Defne', 'Dörtyol', 'Erzin', 'Hassa', 'İskenderun', 'Kırıkhan', 'Kumlu', 'Payas', 'Reyhanlı', 'Samandağ', 'Yayladağı'],
+  Isparta: ['Aksu', 'Atabey', 'Eğirdir', 'Gelendost', 'Gönen', 'Keçiborlu', 'Merkez', 'Senirkent', 'Sütçüler', 'Şarkikaraağaç', 'Uluborlu', 'Yalvaç', 'Yenişarbademli'],
+  Mersin: ['Akdeniz', 'Anamur', 'Aydıncık', 'Bozyazı', 'Çamlıyayla', 'Erdemli', 'Gülnar', 'Mezitli', 'Mut', 'Silifke', 'Tarsus', 'Toroslar', 'Yenişehir'],
+  İstanbul: ['Adalar', 'Arnavutköy', 'Ataşehir', 'Avcılar', 'Bağcılar', 'Bahçelievler', 'Bakırköy', 'Başakşehir', 'Bayrampaşa', 'Beşiktaş', 'Beykoz', 'Beylikdüzü', 'Beyoğlu', 'Büyükçekmece', 'Çatalca', 'Çekmeköy', 'Esenler', 'Esenyurt', 'Eyüpsultan', 'Fatih', 'Gaziosmanpaşa', 'Güngören', 'Kadıköy', 'Kağıthane', 'Kartal', 'Küçükçekmece', 'Maltepe', 'Pendik', 'Sancaktepe', 'Sarıyer', 'Silivri', 'Sultanbeyli', 'Sultangazi', 'Şile', 'Şişli', 'Tuzla', 'Ümraniye', 'Üsküdar', 'Zeytinburnu'],
+  İzmir: ['Aliağa', 'Balçova', 'Bayındır', 'Bayraklı', 'Bergama', 'Beydağ', 'Bornova', 'Buca', 'Çeşme', 'Çiğli', 'Dikili', 'Foça', 'Gaziemir', 'Güzelbahçe', 'Karabağlar', 'Karaburun', 'Karşıyaka', 'Kemalpaşa', 'Kınık', 'Kiraz', 'Konak', 'Menderes', 'Menemen', 'Narlıdere', 'Ödemiş', 'Seferihisar', 'Selçuk', 'Tire', 'Torbalı', 'Urla'],
+  Kars: ['Akyaka', 'Arpaçay', 'Digor', 'Kağızman', 'Merkez', 'Sarıkamış', 'Selim', 'Susuz'],
+  Kastamonu: ['Abana', 'Ağlı', 'Araç', 'Azdavay', 'Bozkurt', 'Cide', 'Çatalzeytin', 'Daday', 'Devrekani', 'Doğanyurt', 'Hanönü', 'İhsangazi', 'İnebolu', 'Küre', 'Merkez', 'Pınarbaşı', 'Seydiler', 'Şenpazar', 'Taşköprü', 'Tosya'],
+  Kayseri: ['Akkışla', 'Bünyan', 'Develi', 'Felahiye', 'Hacılar', 'İncesu', 'Kocasinan', 'Melikgazi', 'Özvatan', 'Pınarbaşı', 'Sarıoğlan', 'Sarız', 'Talas', 'Tomarza', 'Yahyalı', 'Yeşilhisar'],
+  Kırklareli: ['Babaeski', 'Demirköy', 'Kofçaz', 'Lüleburgaz', 'Merkez', 'Pehlivanköy', 'Pınarhisar', 'Vize'],
+  Kırşehir: ['Akçakent', 'Akpınar', 'Boztepe', 'Çiçekdağı', 'Kaman', 'Merkez', 'Mucur'],
+  Kocaeli: ['Başiskele', 'Çayırova', 'Darıca', 'Derince', 'Dilovası', 'Gebze', 'Gölcük', 'İzmit', 'Kandıra', 'Karamürsel', 'Kartepe', 'Körfez'],
+  Konya: ['Ahırlı', 'Akören', 'Akşehir', 'Altınekin', 'Beyşehir', 'Bozkır', 'Cihanbeyli', 'Çeltik', 'Çumra', 'Derbent', 'Derebucak', 'Doğanhisar', 'Emirgazi', 'Ereğli', 'Güneysınır', 'Hadim', 'Halkapınar', 'Hüyük', 'Ilgın', 'Kadınhanı', 'Karapınar', 'Karatay', 'Kulu', 'Meram', 'Sarayönü', 'Selçuklu', 'Seydişehir', 'Taşkent', 'Tuzlukçu', 'Yalıhüyük', 'Yunak'],
+  Kütahya: ['Altıntaş', 'Aslanapa', 'Çavdarhisar', 'Domaniç', 'Dumlupınar', 'Emet', 'Gediz', 'Hisarcık', 'Merkez', 'Pazarlar', 'Şaphane', 'Simav', 'Tavşanlı'],
+  Malatya: ['Akçadağ', 'Arapgir', 'Arguvan', 'Battalgazi', 'Darende', 'Doğanşehir', 'Doğanyol', 'Hekimhan', 'Kale', 'Kuluncak', 'Pütürge', 'Yazıhan', 'Yeşilyurt'],
+  Manisa: ['Ahmetli', 'Akhisar', 'Alaşehir', 'Demirci', 'Gölmarmara', 'Gördes', 'Kırkağaç', 'Köprübaşı', 'Kula', 'Salihli', 'Sarıgöl', 'Saruhanlı', 'Selendi', 'Soma', 'Şehzadeler', 'Turgutlu', 'Yunusemre'],
+  Kahramanmaraş: ['Afşin', 'Andırın', 'Çağlayancerit', 'Dulkadiroğlu', 'Ekinözü', 'Elbistan', 'Göksun', 'Nurhak', 'Onikişubat', 'Pazarcık', 'Türkoğlu'],
+  Mardin: ['Artuklu', 'Dargeçit', 'Derik', 'Kızıltepe', 'Mazıdağı', 'Midyat', 'Nusaybin', 'Ömerli', 'Savur', 'Yeşilli'],
+  Muğla: ['Bodrum', 'Dalaman', 'Datça', 'Fethiye', 'Kavaklıdere', 'Köyceğiz', 'Marmaris', 'Menteşe', 'Milas', 'Ortaca', 'Seydikemer', 'Ula', 'Yatağan'],
+  Muş: ['Bulanık', 'Hasköy', 'Korkut', 'Malazgirt', 'Merkez', 'Varto'],
+  Nevşehir: ['Acıgöl', 'Avanos', 'Derinkuyu', 'Gülşehir', 'Hacıbektaş', 'Kozaklı', 'Merkez', 'Ürgüp'],
+  Niğde: ['Altunhisar', 'Bor', 'Çamardı', 'Çiftlik', 'Merkez', 'Ulukışla'],
+  Ordu: ['Akkuş', 'Altınordu', 'Aybastı', 'Çamaş', 'Çatalpınar', 'Çaybaşı', 'Fatsa', 'Gölköy', 'Gülyalı', 'Gürgentepe', 'İkizce', 'Kabadüz', 'Kabataş', 'Korgan', 'Kumru', 'Mesudiye', 'Perşembe', 'Ulubey', 'Ünye'],
+  Rize: ['Ardeşen', 'Çamlıhemşin', 'Çayeli', 'Derepazarı', 'Fındıklı', 'Güneysu', 'Hemşin', 'İkizdere', 'İyidere', 'Kalkandere', 'Pazar', 'Merkez'],
+  Sakarya: ['Adapazarı', 'Akyazı', 'Arifiye', 'Erenler', 'Ferizli', 'Geyve', 'Hendek', 'Karapürçek', 'Karasu', 'Kaynarca', 'Kocaali', 'Pamukova', 'Sapanca', 'Serdivan', 'Söğütlü', 'Taraklı'],
+  Samsun: ['Alaçam', 'Asarcık', 'Atakum', 'Ayvacık', 'Bafra', 'Canik', 'Çarşamba', 'Havza', 'İlkadım', 'Kavak', 'Ladik', 'Ondokuzmayıs', 'Salıpazarı', 'Tekkeköy', 'Terme', 'Vezirköprü', 'Yakakent'],
+  Siirt: ['Baykan', 'Eruh', 'Kurtalan', 'Merkez', 'Pervari', 'Şirvan', 'Tillo'],
+  Sinop: ['Ayancık', 'Boyabat', 'Dikmen', 'Durağan', 'Erfelek', 'Gerze', 'Merkez', 'Saraydüzü', 'Türkeli'],
+  Sivas: ['Akıncılar', 'Altınyayla', 'Divriği', 'Doğanşar', 'Gemerek', 'Gölova', 'Gürün', 'Hafik', 'İmranlı', 'Kangal', 'Koyulhisar', 'Merkez', 'Suşehri', 'Şarkışla', 'Ulaş', 'Yıldızeli', 'Zara'],
+  Tekirdağ: ['Çerkezköy', 'Çorlu', 'Ergene', 'Hayrabolu', 'Kapaklı', 'Malkara', 'Marmaraereğlisi', 'Muratlı', 'Saray', 'Süleymanpaşa', 'Şarköy'],
+  Tokat: ['Almus', 'Artova', 'Başçiftlik', 'Erbaa', 'Merkez', 'Niksar', 'Pazar', 'Reşadiye', 'Sulusaray', 'Turhal', 'Yeşilyurt', 'Zile'],
+  Trabzon: ['Akçaabat', 'Araklı', 'Arsin', 'Beşikdüzü', 'Çarşıbaşı', 'Çaykara', 'Dernekpazarı', 'Düzköy', 'Hayrat', 'Köprübaşı', 'Maçka', 'Of', 'Ortahisar', 'Sürmene', 'Şalpazarı', 'Tonya', 'Vakfıkebir', 'Yomra'],
+  Tunceli: ['Çemişgezek', 'Hozat', 'Mazgirt', 'Merkez', 'Nazımiye', 'Ovacık', 'Pertek', 'Pülümür'],
+  Şanlıurfa: ['Akçakale', 'Birecik', 'Bozova', 'Ceylanpınar', 'Eyyübiye', 'Halfeti', 'Haliliye', 'Harran', 'Hilvan', 'Karaköprü', 'Siverek', 'Suruç', 'Viranşehir'],
+  Uşak: ['Banaz', 'Eşme', 'Karahallı', 'Merkez', 'Sivaslı', 'Ulubey'],
+  Van: ['Bahçesaray', 'Başkale', 'Çaldıran', 'Çatak', 'Edremit', 'Erciş', 'Gevaş', 'Gürpınar', 'İpekyolu', 'Muradiye', 'Özalp', 'Saray', 'Tuşba'],
+  Yozgat: ['Akdağmadeni', 'Aydıncık', 'Boğazlıyan', 'Çandır', 'Çayıralan', 'Çekerek', 'Kadışehri', 'Saraykent', 'Sarıkaya', 'Sorgun', 'Şefaatli', 'Yenifakılı', 'Yerköy', 'Merkez'],
+  Zonguldak: ['Alaplı', 'Çaycuma', 'Devrek', 'Gökçebey', 'Kilimli', 'Kozlu', 'Merkez', 'Karadeniz Ereğli'],
+  Aksaray: ['Ağaçören', 'Eskil', 'Gülağaç', 'Güzelyurt', 'Merkez', 'Ortaköy', 'Sarıyahşi', 'Sultanhanı'],
+  Bayburt: ['Aydıntepe', 'Demirözü', 'Merkez'],
+  Karaman: ['Ayrancı', 'Başyayla', 'Ermenek', 'Kazımkarabekir', 'Merkez', 'Sarıveliler'],
+  Kırıkkale: ['Bahşili', 'Balışeyh', 'Çelebi', 'Delice', 'Karakeçili', 'Keskin', 'Merkez', 'Sulakyurt', 'Yahşihan'],
+  Batman: ['Beşiri', 'Gercüş', 'Hasankeyf', 'Kozluk', 'Merkez', 'Sason'],
+  Şırnak: ['Beytüşşebap', 'Cizre', 'Güçlükonak', 'İdil', 'Merkez', 'Silopi', 'Uludere'],
+  Bartın: ['Amasra', 'Kurucaşile', 'Merkez', 'Ulus'],
+  Ardahan: ['Çıldır', 'Damal', 'Göle', 'Hanak', 'Merkez', 'Posof'],
+  Iğdır: ['Aralık', 'Karakoyunlu', 'Merkez', 'Tuzluca'],
+  Yalova: ['Altınova', 'Armutlu', 'Çınarcık', 'Çiftlikköy', 'Merkez', 'Termal'],
+  Karabük: ['Eflani', 'Eskipazar', 'Merkez', 'Ovacık', 'Safranbolu', 'Yenice'],
+  Kilis: ['Elbeyli', 'Merkez', 'Musabeyli', 'Polateli'],
+  Osmaniye: ['Bahçe', 'Düziçi', 'Hasanbeyli', 'Kadirli', 'Merkez', 'Sumbas', 'Toprakkale'],
+  Düzce: ['Akçakoca', 'Cumayeri', 'Çilimli', 'Gölyaka', 'Gümüşova', 'Kaynaşlı', 'Merkez', 'Yığılca'],
+};
+
+const CITY_LIST = Object.keys(TURKEY_CITIES).sort((a, b) =>
+  a.localeCompare(b, 'tr-TR'),
+);
+
 type CourseCenter = {
   id: number;
   name: string;
   representative: string;
+  city: string;
   district: string;
   address: string;
   phone: string;
@@ -100,19 +189,6 @@ type CourseCenter = {
   whatsapp: string;
   announcement: string;
 };
-
-const districts = [
-  'Tüm İlçeler',
-  'Altındağ',
-  'Çankaya',
-  'Etimesgut',
-  'Gölbaşı',
-  'Keçiören',
-  'Mamak',
-  'Pursaklar',
-  'Sincan',
-  'Yenimahalle',
-];
 
 const courseTypes = [
   {
@@ -157,7 +233,6 @@ function normalizeCourses(value: unknown): string[] {
     .map((item) => item.trim())
     .filter(Boolean);
 }
-
 
 function normalizeGallery(value: unknown): string[] {
   if (Array.isArray(value)) {
@@ -211,23 +286,7 @@ function getField(
   return '';
 }
 
-/**
- * Apps Script tarafı zaten sadece Onaylandı kayıtları döndürüyor.
- * Eğer API ayrıca Durum gönderirse onu da kontrol ediyoruz.
- * Durum hiç yoksa kaydı elemeden devam ediyoruz.
- */
 function isPublished(item: Record<string, unknown>): boolean {
-  /*
-   * Yayın tarihi ve bitiş tarihi Apps Script tarafında
-   * kontrol ediliyor. Frontend'de tekrar tarih parse etmiyoruz.
-   *
-   * Bunun nedeni Google Sheets'teki GG.AA.YYYY formatının
-   * JavaScript'in new Date() parser'ı tarafından yanlış
-   * yorumlanabilmesi.
-   *
-   * API Durum alanını gönderiyorsa ek güvenlik kontrolü yapıyoruz.
-   * Durum alanı yoksa Apps Script filtresine güveniyoruz.
-   */
   const status = getField(
     item,
     'durum',
@@ -252,6 +311,21 @@ function normalizeCenter(
   item: Record<string, unknown>,
   index: number,
 ): CourseCenter {
+  const rawCity = getField(
+  item,
+  'şehir',
+  'sehir',
+  'Şehir',
+  'şehir adı',
+  'Şehir Adı',
+  'il',
+  'İl',
+  'il adı',
+  'İl Adı',
+  'city',
+  'City',
+);
+
   return {
     id: index + 1,
 
@@ -271,6 +345,9 @@ function normalizeCenter(
       'Yetkili',
       'representative',
     ),
+
+    // Şehir belirtilmemişse geriye dönük uyumluluk için varsayılan Ankara
+    city: rawCity || 'Ankara',
 
     district: getField(
       item,
@@ -400,7 +477,8 @@ function normalizeCenter(
       'duyuru',
       'Duyuru',
       'announcement',
-    ),  };
+    ),
+  };
 }
 
 function CourseCenterCard({
@@ -408,8 +486,12 @@ function CourseCenterCard({
 }: {
   center: CourseCenter;
 }) {
+  const locationText = [center.address, center.district, center.city]
+    .filter(Boolean)
+    .join(', ');
+
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    `${center.address}, ${center.district}, Ankara`,
+    locationText || center.name,
   )}`;
 
   const isPremium =
@@ -555,9 +637,9 @@ function CourseCenterCard({
               <div className="mt-2 flex items-center gap-1.5 text-sm text-[var(--text-secondary)]">
                 <MapPin className="w-4 h-4 flex-shrink-0" />
                 <span>
-                  {center.district
-                    ? `${center.district}, Ankara`
-                    : 'Ankara'}
+                  {center.district && center.city
+                    ? `${center.district}, ${center.city}`
+                    : center.city || center.district || 'Türkiye'}
                 </span>
               </div>
             </div>
@@ -958,13 +1040,13 @@ function ListingApplicationModal({
     representative: '',
     phone: '',
     email: '',
+    city: '',
     district: '',
     address: '',
     website: '',
     description: '',
     kvkk: false,
   });
-
 
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
   const [selectedPackage, setSelectedPackage] =
@@ -990,6 +1072,11 @@ function ListingApplicationModal({
         ? PAYMENT_URLS.standardMonthly
         : PAYMENT_URLS.standardYearly;
 
+  const availableFormDistricts = useMemo(() => {
+    if (!form.city || !TURKEY_CITIES[form.city]) return [];
+    return TURKEY_CITIES[form.city];
+  }, [form.city]);
+
   const toggleCourse = (course: string) => {
     setSelectedCourses((current) =>
       current.includes(course)
@@ -1002,12 +1089,14 @@ function ListingApplicationModal({
     field: keyof typeof form,
     value: string | boolean,
   ) => {
-    setForm((current) => ({
-      ...current,
-      [field]: value,
-    }));
+    setForm((current) => {
+      const next = { ...current, [field]: value };
+      if (field === 'city') {
+        next.district = '';
+      }
+      return next;
+    });
   };
-
 
   const handleSubmit = async (
     event: React.FormEvent,
@@ -1020,6 +1109,7 @@ function ListingApplicationModal({
       !form.representative.trim() ||
       !form.phone.trim() ||
       !form.email.trim() ||
+      !form.city ||
       !form.district ||
       !form.address.trim() ||
       selectedCourses.length === 0 ||
@@ -1039,6 +1129,7 @@ function ListingApplicationModal({
         representative: form.representative.trim(),
         phone: form.phone.trim(),
         email: form.email.trim(),
+        city: form.city,
         district: form.district,
         address: form.address.trim(),
         website: form.website.trim(),
@@ -1091,11 +1182,6 @@ function ListingApplicationModal({
         );
       }
 
-      /*
-       * Başvuru önce Google Sheets'e kaydedilir.
-       * Kayıt başarılı olduktan sonra seçilen Linkode
-       * ödeme sayfasına yönlendirilir.
-       */
       window.location.href = paymentUrl;
     } catch (submitError) {
       console.error(
@@ -1216,11 +1302,7 @@ function ListingApplicationModal({
                     placeholder="Örn. ABC İlk Yardım Eğitim Merkezi"
                     value={form.centerName}
                     onChange={(value) =>
-                      updateField(
-                        'centerName',
-      
-                        value,
-                      )
+                      updateField('centerName', value)
                     }
                     required
                   />
@@ -1233,10 +1315,7 @@ function ListingApplicationModal({
                     placeholder="Ad Soyad"
                     value={form.representative}
                     onChange={(value) =>
-                      updateField(
-                        'representative',
-                        value,
-                      )
+                      updateField('representative', value)
                     }
                     required
                   />
@@ -1249,10 +1328,7 @@ function ListingApplicationModal({
                     placeholder="05XX XXX XX XX"
                     value={form.phone}
                     onChange={(value) =>
-                      updateField(
-                        'phone',
-                        value,
-                      )
+                      updateField('phone', value)
                     }
                     type="tel"
                     required
@@ -1266,10 +1342,7 @@ function ListingApplicationModal({
                     placeholder="ornek@firma.com"
                     value={form.email}
                     onChange={(value) =>
-                      updateField(
-                        'email',
-                        value,
-                      )
+                      updateField('email', value)
                     }
                     type="email"
                     required
@@ -1286,37 +1359,51 @@ function ListingApplicationModal({
                 </div>
 
                 <div className="space-y-4">
-                  <div>
-                    <FieldLabel required>
-                      İlçe
-                    </FieldLabel>
-
-                    <div className="relative">
-                      <select
-                        value={form.district}
-                        onChange={(event) =>
-                          updateField(
-                            'district',
-                            event.target.value,
-                          )
-                        }
-                        className="appearance-none w-full h-12 px-4 pr-10 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-blue)] transition-all cursor-pointer"
-                        required
-                      >
-                        <option
-                          value=""
-                          className="text-[var(--text-primary)]"
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <FieldLabel required>İl</FieldLabel>
+                      <div className="relative">
+                        <select
+                          value={form.city}
+                          onChange={(event) =>
+                            updateField('city', event.target.value)
+                          }
+                          className="appearance-none w-full h-12 px-4 pr-10 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-blue)] transition-all cursor-pointer"
+                          required
                         >
-                          İlçe seçin
-                        </option>
+                          <option value="" className="text-[var(--text-primary)]">
+                            İl seçin
+                          </option>
+                          {CITY_LIST.map((cityName) => (
+                            <option
+                              key={cityName}
+                              value={cityName}
+                              className="text-[var(--text-primary)]"
+                            >
+                              {cityName}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
+                      </div>
+                    </div>
 
-                        {districts
-                          .filter(
-                            (district) =>
-                              district !==
-                              'Tüm İlçeler',
-                          )
-                          .map((district) => (
+                    <div>
+                      <FieldLabel required>İlçe</FieldLabel>
+                      <div className="relative">
+                        <select
+                          value={form.district}
+                          onChange={(event) =>
+                            updateField('district', event.target.value)
+                          }
+                          disabled={!form.city}
+                          className="appearance-none w-full h-12 px-4 pr-10 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-primary)] text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent-blue)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                          required
+                        >
+                          <option value="" className="text-[var(--text-primary)]">
+                            {form.city ? 'İlçe seçin' : 'Önce il seçin'}
+                          </option>
+                          {availableFormDistricts.map((district) => (
                             <option
                               key={district}
                               value={district}
@@ -1325,9 +1412,9 @@ function ListingApplicationModal({
                               {district}
                             </option>
                           ))}
-                      </select>
-
-                      <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
+                        </select>
+                        <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
+                      </div>
                     </div>
                   </div>
 
@@ -1339,10 +1426,7 @@ function ListingApplicationModal({
                     <textarea
                       value={form.address}
                       onChange={(event) =>
-                        updateField(
-                          'address',
-                          event.target.value,
-                        )
+                        updateField('address', event.target.value)
                       }
                       placeholder="Eğitim merkezinizin açık adresini yazın."
                       rows={3}
@@ -1359,10 +1443,7 @@ function ListingApplicationModal({
                     placeholder="https://www.ornek.com"
                     value={form.website}
                     onChange={(value) =>
-                      updateField(
-                        'website',
-                        value,
-                      )
+                      updateField('website', value)
                     }
                     type="url"
                   />
@@ -1388,9 +1469,7 @@ function ListingApplicationModal({
                     'Kurumsal Eğitim',
                   ].map((course) => {
                     const selected =
-                      selectedCourses.includes(
-                        course,
-                      );
+                      selectedCourses.includes(course);
 
                     return (
                       <button
@@ -1597,10 +1676,7 @@ function ListingApplicationModal({
                 <textarea
                   value={form.description}
                   onChange={(event) =>
-                    updateField(
-                      'description',
-                      event.target.value,
-                    )
+                    updateField('description', event.target.value)
                   }
                   placeholder="Eğitim merkeziniz ve sunduğunuz hizmetler hakkında kısa bilgi verebilirsiniz."
                   rows={4}
@@ -1608,16 +1684,12 @@ function ListingApplicationModal({
                 />
               </section>
 
-
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={form.kvkk}
                   onChange={(event) =>
-                    updateField(
-                      'kvkk',
-                      event.target.checked,
-                    )
+                    updateField('kvkk', event.target.checked)
                   }
                   className="mt-1 w-4 h-4 accent-[var(--accent-blue)]"
                   required
@@ -1671,7 +1743,7 @@ function ListingApplicationModal({
                     {submitting ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        Dosyalar yükleniyor...
+                        Başvuru Gönderiliyor...
                       </>
                     ) : (
                       <>
@@ -1691,23 +1763,27 @@ function ListingApplicationModal({
 }
 
 export default function FirstAidCourses() {
-  const [searchTerm, setSearchTerm] =
-    useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCity, setSelectedCity] = useState('Tüm İller');
+  const [selectedDistrict, setSelectedDistrict] = useState('Tüm İlçeler');
 
-  const [selectedDistrict, setSelectedDistrict] =
-    useState('Tüm İlçeler');
+  const [isApplicationOpen, setIsApplicationOpen] = useState(false);
+  const [courseCenters, setCourseCenters] = useState<CourseCenter[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
-  const [isApplicationOpen, setIsApplicationOpen] =
-    useState(false);
+  // İl değiştiğinde ilçe filtresini sıfırlama
+  const handleCityChange = (city: string) => {
+    setSelectedCity(city);
+    setSelectedDistrict('Tüm İlçeler');
+  };
 
-  const [courseCenters, setCourseCenters] =
-    useState<CourseCenter[]>([]);
-
-  const [loading, setLoading] =
-    useState(true);
-
-  const [loadError, setLoadError] =
-    useState('');
+  const availableDistricts = useMemo(() => {
+    if (selectedCity === 'Tüm İller' || !TURKEY_CITIES[selectedCity]) {
+      return [];
+    }
+    return ['Tüm İlçeler', ...TURKEY_CITIES[selectedCity]];
+  }, [selectedCity]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1734,7 +1810,6 @@ export default function FirstAidCourses() {
         const data = await response.json();
 
         const apiSuccess =
-          
           data?.basarili ??
           data?.success ??
           true;
@@ -1748,18 +1823,11 @@ export default function FirstAidCourses() {
           );
         }
 
-        const rawCourses = Array.isArray(
-          data?.kurslar,
-        )
+        const rawCourses = Array.isArray(data?.kurslar)
           ? data.kurslar
           : Array.isArray(data?.courses)
             ? data.courses
             : [];
-
-        console.log(
-          'Google Sheets kurs verileri:',
-          rawCourses,
-        );
 
         const visibleCourses = rawCourses
           .filter(
@@ -1797,9 +1865,7 @@ export default function FirstAidCourses() {
           });
 
         if (!cancelled) {
-          setCourseCenters(
-            visibleCourses,
-          );
+          setCourseCenters(visibleCourses);
         }
       } catch (error) {
         console.error(
@@ -1832,48 +1898,53 @@ export default function FirstAidCourses() {
         .toLocaleLowerCase('tr-TR')
         .trim();
 
-    return courseCenters.filter(
-      (center) => {
-        const matchesSearch =
-          !normalizedSearch ||
-          center.name
+    return courseCenters.filter((center) => {
+      const matchesSearch =
+        !normalizedSearch ||
+        center.name
+          .toLocaleLowerCase('tr-TR')
+          .includes(normalizedSearch) ||
+        center.city
+          .toLocaleLowerCase('tr-TR')
+          .includes(normalizedSearch) ||
+        center.district
+          .toLocaleLowerCase('tr-TR')
+          .includes(normalizedSearch) ||
+        center.courses.some((course) =>
+          course
             .toLocaleLowerCase('tr-TR')
-            .includes(
-              normalizedSearch,
-            ) ||
-          center.district
-            .toLocaleLowerCase('tr-TR')
-            .includes(
-              normalizedSearch,
-            ) ||
-          center.courses.some(
-            (course) =>
-              course
-                .toLocaleLowerCase(
-                  'tr-TR',
-                )
-                .includes(
-                  normalizedSearch,
-                ),
-          );
-
-        const matchesDistrict =
-          selectedDistrict ===
-            'Tüm İlçeler' ||
-          center.district ===
-            selectedDistrict;
-
-        return (
-          matchesSearch &&
-          matchesDistrict
+            .includes(normalizedSearch),
         );
-      },
-    );
+
+      const matchesCity =
+        selectedCity === 'Tüm İller' ||
+        center.city.toLocaleLowerCase('tr-TR') ===
+          selectedCity.toLocaleLowerCase('tr-TR');
+
+      const matchesDistrict =
+        selectedDistrict === 'Tüm İlçeler' ||
+        center.district.toLocaleLowerCase('tr-TR') ===
+          selectedDistrict.toLocaleLowerCase('tr-TR');
+
+      return matchesSearch && matchesCity && matchesDistrict;
+    });
   }, [
     courseCenters,
     searchTerm,
+    selectedCity,
     selectedDistrict,
   ]);
+
+  // Dinamik bölge gösterimi başlığı
+  const currentRegionLabel = useMemo(() => {
+    if (selectedCity !== 'Tüm İller') {
+      if (selectedDistrict !== 'Tüm İlçeler') {
+        return `${selectedCity} / ${selectedDistrict}`;
+      }
+      return selectedCity;
+    }
+    return 'Türkiye Geneli';
+  }, [selectedCity, selectedDistrict]);
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]">
@@ -1920,19 +1991,19 @@ export default function FirstAidCourses() {
               </div>
 
               <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-tight text-[var(--text-primary)]">
-                Ankara'da İlk Yardım
+                Türkiye'de İlk Yardım
                 <br className="hidden sm:block" />
                 Eğitimi Alın
               </h1>
 
               <p className="mt-5 text-sm sm:text-lg text-[var(--text-secondary)] leading-relaxed max-w-2xl mx-auto">
                 İlk yardım eğitimi almak isteyenler
-                için platformumuzda yer alan eğitim
+                için platformumuzda yer alan onaylı eğitim
                 merkezlerini keşfedin.
               </p>
 
-              <div className="mt-8 max-w-3xl mx-auto">
-                <div className="grid grid-cols-1 sm:grid-cols-[1fr_190px] gap-3">
+              <div className="mt-8 max-w-4xl mx-auto">
+                <div className="grid grid-cols-1 sm:grid-cols-[1fr_180px_180px] gap-3">
                   <div className="relative">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-secondary)]" />
 
@@ -1940,27 +2011,53 @@ export default function FirstAidCourses() {
                       type="text"
                       value={searchTerm}
                       onChange={(event) =>
-                        setSearchTerm(
-                          event.target.value,
-                        )
+                        setSearchTerm(event.target.value)
                       }
-                      placeholder="Kurs merkezi veya ilçe ara..."
+                      placeholder="Kurs merkezi, il veya ilçe ara..."
                       className="w-full h-14 pl-12 pr-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-card)] text-sm sm:text-base text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] outline-none focus:ring-2 focus:ring-[rgba(23,106,246,0.2)] focus:border-[var(--accent-blue)] transition-all shadow-sm"
                     />
                   </div>
 
                   <div className="relative">
                     <select
-                      value={selectedDistrict}
+                      value={selectedCity}
                       onChange={(event) =>
-                        setSelectedDistrict(
-                          event.target.value,
-                        )
+                        handleCityChange(event.target.value)
                       }
                       className="appearance-none w-full h-14 px-4 pr-10 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-card)] text-sm text-[var(--text-primary)] outline-none focus:ring-2 focus:ring-[rgba(23,106,246,0.2)] focus:border-[var(--accent-blue)] transition-all shadow-sm cursor-pointer"
                     >
-                      {districts.map(
-                        (district) => (
+                      <option value="Tüm İller" className="text-[var(--text-primary)]">
+                        Tüm İller
+                      </option>
+                      {CITY_LIST.map((cityName) => (
+                        <option
+                          key={cityName}
+                          value={cityName}
+                          className="text-[var(--text-primary)]"
+                        >
+                          {cityName}
+                        </option>
+                      ))}
+                    </select>
+
+                    <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
+                  </div>
+
+                  <div className="relative">
+                    <select
+                      value={selectedDistrict}
+                      onChange={(event) =>
+                        setSelectedDistrict(event.target.value)
+                      }
+                      disabled={selectedCity === 'Tüm İller'}
+                      className="appearance-none w-full h-14 px-4 pr-10 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-card)] text-sm text-[var(--text-primary)] outline-none focus:ring-2 focus:ring-[rgba(23,106,246,0.2)] focus:border-[var(--accent-blue)] transition-all shadow-sm cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {selectedCity === 'Tüm İller' ? (
+                        <option value="Tüm İlçeler" className="text-[var(--text-primary)]">
+                          İlçe Seçin
+                        </option>
+                      ) : (
+                        availableDistricts.map((district) => (
                           <option
                             key={district}
                             value={district}
@@ -1968,7 +2065,7 @@ export default function FirstAidCourses() {
                           >
                             {district}
                           </option>
-                        ),
+                        ))
                       )}
                     </select>
 
@@ -1985,7 +2082,7 @@ export default function FirstAidCourses() {
 
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-[var(--accent-blue)]" />
-                  Ankara geneli
+                  Türkiye geneli
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -2061,9 +2158,9 @@ export default function FirstAidCourses() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
-                <MapPin className="w-4 h-4" />
-                Ankara
+              <div className="flex items-center gap-2 text-xs font-medium text-[var(--text-secondary)]">
+                <MapPin className="w-4 h-4 text-[var(--accent-blue)]" />
+                {currentRegionLabel}
               </div>
             </div>
 
@@ -2105,14 +2202,12 @@ export default function FirstAidCourses() {
               </div>
             ) : filteredCenters.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {filteredCenters.map(
-                  (center) => (
-                    <CourseCenterCard
-                      key={center.id}
-                      center={center}
-                    />
-                  ),
-                )}
+                {filteredCenters.map((center) => (
+                  <CourseCenterCard
+                    key={center.id}
+                    center={center}
+                  />
+                ))}
               </div>
             ) : (
               <div className="rounded-3xl border border-[var(--border-subtle)] bg-[var(--bg-card)] overflow-hidden shadow-sm">
@@ -2129,19 +2224,16 @@ export default function FirstAidCourses() {
 
                   <p className="mt-3 max-w-xl mx-auto text-sm text-[var(--text-secondary)] leading-relaxed">
                     {courseCenters.length > 0
-                      ? 'Arama veya ilçe filtresini değiştirerek tekrar deneyebilirsiniz.'
+                      ? 'Arama, il veya ilçe filtresini değiştirerek tekrar deneyebilirsiniz.'
                       : 'En Yakın OED platformunda yer almak isteyen ilk yardım eğitim merkezleri başvuru yaparak işletme bilgilerini yayınlatabilir.'}
                   </p>
 
-                  {courseCenters.length ===
-                    0 && (
+                  {courseCenters.length === 0 && (
                     <div className="mt-7 flex flex-col sm:flex-row items-center justify-center gap-3">
                       <button
                         type="button"
                         onClick={() =>
-                          setIsApplicationOpen(
-                            true,
-                          )
+                          setIsApplicationOpen(true)
                         }
                         className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-xl bg-[var(--accent-blue)] text-white text-sm font-semibold hover:brightness-95 transition-all shadow-sm"
                       >
@@ -2182,7 +2274,7 @@ export default function FirstAidCourses() {
                     </h2>
 
                     <p className="mt-4 max-w-2xl text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
-                      Eğitim merkezinizi Ankara'da
+                      Eğitim merkezinizi Türkiye genelinde
                       ilk yardım eğitimi arayan
                       kullanıcılara ulaştırın.
                       Merkezinizin iletişim, konum
@@ -2212,9 +2304,7 @@ export default function FirstAidCourses() {
                   <button
                     type="button"
                     onClick={() =>
-                      setIsApplicationOpen(
-                        true,
-                      )
+                      setIsApplicationOpen(true)
                     }
                     className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-xl bg-[var(--accent-blue)] text-white text-sm font-semibold hover:brightness-95 transition-all shadow-sm whitespace-nowrap"
                   >
@@ -2276,8 +2366,3 @@ export default function FirstAidCourses() {
     </div>
   );
 }
-
-
-
-
-
