@@ -128,14 +128,15 @@ export const OED_LOCATIONS: OEDLocation[] = [
     status: 'available',
     hours: '24 Saat',
   },
-  {
+    {
     id: 15,
     name: 'Gölbaşı Moğan Parkı OED',
-    address: 'Gölbaşı, Ankara',
-    lat: 39.784871,
-    lng: 32.808963,
+    address: 'Mogan Parkı, Gölbaşı, Ankara',
+    lat: 39.7797565,
+    lng: 32.8080713,
     status: 'available',
     hours: '24 Saat',
+    note: '⚠️ OED cihazının kesin konumu henüz doğrulanmamıştır.',
   },
   {
     id: 16,
